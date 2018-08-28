@@ -60,15 +60,19 @@ int C(int x, int y)
 
   printf("enter C\n");
   // PRINT ADDRESS OF u,v,w,i,p;
-  printf("&u = %8x, &v = %8x, &w = %8x, &i = %8x, &p = %8x\n",
+  printf("&u = %8x  &v = %8x  &w = %8x  &i = %8x  &p = %8x\n",
 &u, &v, &w, &i, p);
   u=10; v=11; w=12; i=13;
 
   FP = (int *)getebp();
-
+  printf("Print Stack Frame Link List\n---------------------------------------\n");
 // (2). Write C code to print the stack frame link list.
-
-
+  while(FP != 0)
+  {
+        printf("FP=%8x  |  *FP=%8x\n", FP, *FP);
+        FP = (int*)*FP;
+  }
+  printf("Print Stack Contents\n---------------------------------------\n");
  p = (int *)&p;
 
 // (3). Print the stack contents from p to the frame of main()
@@ -77,3 +81,4 @@ int C(int x, int y)
 // (4). On a hard copy of the print out, identify the stack contents
 //     as LOCAL VARIABLES, PARAMETERS, stack frame pointer of each function.
 }
+      
