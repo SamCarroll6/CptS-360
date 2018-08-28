@@ -56,7 +56,7 @@ int B(int x, int y)
 
 int C(int x, int y)
 {
-  int u, v, w, i, *p;
+  int u, v, w, i, count, *p;
 
   printf("enter C\n");
   // PRINT ADDRESS OF u,v,w,i,p;
@@ -65,15 +65,20 @@ int C(int x, int y)
   u=10; v=11; w=12; i=13;
 
   FP = (int *)getebp();
-  printf("Print Stack Frame Link List\n---------------------------------------\n");
+  printf("\nPrint Stack Frame Link List\n---------------------------------------\n");
 // (2). Write C code to print the stack frame link list.
   while(FP != 0)
   {
         printf("FP=%8x  |  *FP=%8x\n", FP, *FP);
         FP = (int*)*FP;
   }
-  printf("Print Stack Contents\n---------------------------------------\n");
- p = (int *)&p;
+  printf("\nPrint Stack Contents\n---------------------------------------\n");
+  p = (int *)&p;
+  for(count = 0; count < 128; count++)
+  {
+        printf("P=%8x  |  *P=%8x\n", p, *p);
+        p++;
+  }
 
 // (3). Print the stack contents from p to the frame of main()
 //     YOU MAY JUST PRINT 128 entries of the stack contents.
