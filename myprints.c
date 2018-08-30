@@ -15,7 +15,13 @@ int printc(char x)
 */
 int main(int argc, char *argv[], char *env[])
 {
-myprintf("char check = %c\nstring check = %s\nunsigned check = %u\ninteger check = %d\noctal check = %o\nhex check = %x\n",'A', "hello there", 50, -50, 80, 100);
+   int i;
+   myprintf("My printf tests:\nchar check = %c\nstring check = %s\nunsigned check = %u\ninteger check = %d\noctal check = %o\nhex check = %x\n",'A', "hello there", 50, -50, 80, 100);
+   myprintf("argc value: %d\n", argc);
+   for(i = 0; i < argc; i++)
+   {
+      myprintf("argv #%d: %s\n", i, argv[i]);
+   } 
 }
 
 /*

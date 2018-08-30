@@ -108,4 +108,5 @@ int myprintf(char *fmt, ...)
 	cp++;   
   }   
 }
+
 #endif
