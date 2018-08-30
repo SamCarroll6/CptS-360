@@ -1,38 +1,15 @@
-#include "header.h"
-//#include <stdio.h>
-//#include <stdlib.h>
+#ifndef HEADER_H
+#define HEADER_H
 
-/*typedef unsigned int u32;
+#include <stdio.h>
+#include <stdlib.h>
 
+typedef unsigned int u32;
 char *ctable = "0123456789ABCDEF";
 int  BASE = 10; 
 
 // K.C. Wang supplied printu and rpu function:
-int printc(char x)
-{
-    putchar(x);
-}
-*/
-int main(int argc, char *argv[], char *env[])
-{
-    char val = 'c';
-    printd(-0);
-    printf("\n");
-    printd(-55);
-    printf("\n");
-    printd(100);
-    printf("\n");
-    printx(1000);
-    printf("\n");
-    printo(1000);
-    printf("\n");
-    printc(val);
-    printf("\n");
-    prints("words");
-    printf("\n");
-}
 
-/*
 int rpu(u32 x)
 {  
     char c;
@@ -49,9 +26,9 @@ int printu(u32 x)
    (x==0)? putchar('0') : rpu(x);
    putchar(' ');
 }
-*/
+
 /**********************************************/
-/*
+
 int printd(int x)
 {
    BASE = 10;
@@ -79,6 +56,11 @@ int printo(u32 x)
    (x==0)? putchar('0') : rpu(x);
 }
 
+int printc(char x)
+{
+   putchar(x);
+}
+
 int prints(char* x)
 {
   while(*x)
@@ -87,5 +69,4 @@ int prints(char* x)
 	x++;
   }
 }
-
-*/
+#endif
