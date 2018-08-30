@@ -15,21 +15,7 @@ int printc(char x)
 */
 int main(int argc, char *argv[], char *env[])
 {
-    char val = 'c';
-    printd(-0);
-    printf("\n");
-    printd(-55);
-    printf("\n");
-    printd(100);
-    printf("\n");
-    printx(1000);
-    printf("\n");
-    printo(1000);
-    printf("\n");
-    printc(val);
-    printf("\n");
-    prints("words");
-    printf("\n");
+myprintf("char check = %c\nstring check = %s\nunsigned check = %u\ninteger check = %d\noctal check = %o\nhex check = %x\n",'A', "hello there", 50, -50, 80, 100);
 }
 
 /*

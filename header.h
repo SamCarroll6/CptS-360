@@ -69,4 +69,43 @@ int prints(char* x)
 	x++;
   }
 }
+
+int myprintf(char *fmt, ...)
+{
+  char *cp = fmt;
+  int *ip = (int *)(&fmt + 1);
+  while(*cp)
+  {
+	if(*cp != '%')
+	{
+	   putchar(*cp);
+	}
+	else
+	{
+	   cp++;
+	   switch((char)*cp)
+	 {
+	   case 'c':
+	      printc((char) *ip++);
+	      break; 
+	   case 'd':
+	      printd((int) *ip++);
+	      break;
+	   case 'x':
+	      printx((u32) *ip++);
+	      break;
+	   case 'o':
+	      printo((u32) *ip++);
+	      break;
+	   case 's':
+	      prints((char *) *ip++);
+	      break;
+	   case 'u':
+	      printu((u32) *ip++);
+	      break; 
+	 }
+	}
+	cp++;   
+  }   
+}
 #endif
