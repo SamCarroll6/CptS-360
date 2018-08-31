@@ -21,6 +21,10 @@ int main(int argc, char *argv[], char *env[])
    for(i = 0; i < argc; i++)
    {
       myprintf("argv #%d: %s\n", i, argv[i]);
+   }
+   for(i = 0; env[i] != NULL; i++)
+   {
+      myprintf("env #%d: %s\n", i, env[i]);
    } 
 }
 
