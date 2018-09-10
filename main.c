@@ -2,6 +2,8 @@
 
 int main(int argc, char* argv[])
 {
+	initroot();
+	/*
 	char *hold = "/one/two/three/four";
 	writetofile("myfile.txt");
 	readfromfile("myfile.txt");
@@ -12,4 +14,6 @@ int main(int argc, char* argv[])
 	val = tokenize(hold);
 	printf("\n%s\n", hold);
 	printf("%d\n", val);
+	*/
+	mkdir("dir1");
 }
