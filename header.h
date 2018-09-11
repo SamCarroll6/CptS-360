@@ -181,7 +181,7 @@ NODE *path2node(char *pathname)
 		}
 		// Return 0 and print error if file type in pathname 
 		// is not a directory type.
-		if(p->type != 'd')
+		if(p->type != 'd' && i+1 != numpath)
 		{
 			// Check if matched name from search child is directory. 
 			// If it is a file it will return 1 so calling function 
@@ -365,45 +365,92 @@ void pwdhelper(NODE *parentprint)
 int rmdir(char *pathname)
 {
 	printf("**** rmdir %s\n", pathname);
+	// Node value for the node to be removed
 	NODE *pathnode = path2node(pathname);
-	NODE *checkval = pathnode->parent;
+	// if pathname doesn't exist or somewhere in the pathname
+	// a file is referenced as a directory
 	if(pathnode == 0 || pathnode == 1)
 	{
 		return 0;
 	}
-	else if(checkval == pathnode)
+	// Parent node of node to be removed
+	NODE *checkval = pathnode->parent;
+	// if the returned node is the root do not remove
+	if(checkval == pathnode)
 	{
 		printf("Error: Can't remove root\n");
 		return 0;
 	}
+	// If node2path returns a file instead of directory
 	else if(pathnode->type != 'd')
 	{
 		printf("rmdir: failed to remove '%s': not a directory\n", pathnode->name);
 		return 0;
 	}
+	// Can't remove non empty directories, this checks for that
 	else if(pathnode->child)
 	{
 		printf("rmdir: failed to remove '%s': directory not empty\n", pathnode->name);
 		return 0;
 	}
+	// If node to be removed is immediate child of parent 
+	// account for this when removing the node.
 	if(checkval->child == pathnode)
 	{
 		checkval->child = pathnode->sibling;
 		free(pathnode);
 		return 1;
 	}
+	// Find node before pathnode in sibling linked list
 	checkval = checkval->child;
 	while(strcmp(checkval->sibling->name, pathnode->name) != 0 && checkval)
 	{
 		checkval = checkval->sibling;
 	}
+	// Remove pathnode and set checkval sibling node to pathnodes sibling
 	checkval->sibling = pathnode->sibling;
 	free(pathnode);
 	return 1;
-
-
 }
 
+int rm(char *pathname)
+{
+	printf("**** rm %s\n", pathname);
+	// Node value for the node to be removed
+	NODE *pathnode = path2node(pathname);
+	// if pathname doesn't exist or somewhere in the pathname
+	// a file is referenced as a directory
+	if(pathnode == 0 || pathnode == 1)
+	{
+		return 0;
+	}
+	// Parent node of node to be removed
+	NODE *checkval = pathnode->parent;
+	// If node2path returns a directory
+	if(pathnode->type == 'd')
+	{
+		printf("rm: failed to remove '%s': Is a directory\n", pathnode->name);
+		return 0;
+	}
+	// If node to be removed is immediate child of parent 
+	// account for this when removing the node.
+	else if(checkval->child == pathnode)
+	{
+		checkval->child = pathnode->sibling;
+		free(pathnode);
+		return 1;
+	}
+	// Find node before pathnode in sibling linked list
+	checkval = checkval->child;
+	while(strcmp(checkval->sibling->name, pathnode->name) != 0 && checkval)
+	{
+		checkval = checkval->sibling;
+	}
+	// Remove pathnode and set checkval sibling node to pathnodes sibling
+	checkval->sibling = pathnode->sibling;
+	free(pathnode);
+	return 1;
+}
 
 
 

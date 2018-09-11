@@ -31,7 +31,20 @@ int main(int argc, char* argv[])
 	cd("/");
 	pwd();
 	printf("\n\nTry rmdir:\n");
-	rmdir("dir1");
+	//rmdir("dir1");
 	rmdir("dir2");
+	//cd("dir1");
+	rmdir("/");
+	ls();
+	rm("f1");
 	cd("dir1");
+	rm("f1");
+	ls();
+	cd("/");
+	ls();
+	// mkdir("d1");
+	// creat("f1");
+	// rmdir("d1");
+	// rm("f1");
+	// ls();
 }
