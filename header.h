@@ -18,13 +18,13 @@ FILE *fp;
 
 NODE *newnode(char *name, char type, NODE *parent)
 {
-        NODE *ret = (NODE*)malloc(sizeof(NODE));
-        ret->type = type;
-        strcpy(ret->name, name);
-        ret->parent = parent;
-        ret->sibling = NULL;
+    NODE *ret = (NODE*)malloc(sizeof(NODE));
+    ret->type = type;
+	strcpy(ret->name, name);
+    ret->parent = parent;
+    ret->sibling = NULL;
 	ret->child = NULL;
-        return ret;
+    return ret;
 }
 
 
@@ -83,13 +83,7 @@ int readfromfile(char *filename)
 int tokenize(char *pathname)
 {
 	int ret = 0;
-	int i = 0;
 	char hold[128];
-	while(name[i])
-	{
-		name[i] = NULL;
-		i++;
-	}
 	// Copy pathname to avoid modifying original string
 	strcpy(hold, pathname);	
 	char *token = strtok(hold, "/");
@@ -101,12 +95,6 @@ int tokenize(char *pathname)
 		}
 		ret++;
 		token = strtok(NULL, "/");
-	}
-	i = 0;
-	while(dname[i] != '\0')
-	{
-		dname[i] = '\0';
-		i++;
 	}
 	// return number of directories in pathname
 	n = ret;
@@ -120,14 +108,22 @@ int tokenize(char *pathname)
  * directory/files name from pathname and 
  * store it
  */
-int devbname(void)
+int devbname(char *pathname)
 {
-	int i;
-	if(name[1] != NULL)
+	int i = 1;
+	if(pathname[0] == '/')
+	{
+		dname[0] = '/';
+	}
+	if(name[1] != NULL && dname[0] == '/')
+	{
+		strcat(dname, name[0]);
+	}
+	else if(name[1] != NULL)
 	{
 		strcpy(dname, name[0]);
 	}
-	for(i = 1; i < n-1; i++)
+	for(i; i < n-1; i++)
 	{
 		strcat(dname, name[i]);
 	}
@@ -139,7 +135,6 @@ NODE *search_child(NODE *parent, char *name)
 	NODE *childlist = parent->child;	
 	while(childlist)
 	{
-		printf("Searching child\n");
 		if(strcmp(childlist->name, name) == 0)
 		{
 			return childlist;
@@ -152,9 +147,6 @@ NODE *search_child(NODE *parent, char *name)
 NODE *path2node(char *pathname)
 {
 	int numpath = 0;
-	//NODE *p;
-if(pathname != NULL)
-{
 	if(pathname[0] == '/')
 	{
 		start = root;
@@ -163,10 +155,7 @@ if(pathname != NULL)
 	{
 		start = cwd;
 	}
-	//NODE *p = (NODE*)malloc(sizeof(NODE));
-	//NODE *p = start;
 	numpath = tokenize(pathname);
-}
 	NODE *p = cwd;
 	for(int i = 0; i < numpath; i++)
 	{
@@ -179,17 +168,6 @@ if(pathname != NULL)
 	return p;
 }
 
-/*
-NODE *newnode(char *name, char type, NODE *parent)
-{
-	NODE *ret = (NODE*)malloc(sizeof(NODE));
-	ret->type = type;
-	strcpy(ret->name, name);
-	ret->parent = parent;
-	ret->sibling = NULL;
-	return ret;
-}
-*/
 
 int mkdir(char *pathname)
 {
@@ -200,21 +178,71 @@ int mkdir(char *pathname)
 		printf("Error: Directory already exists\n");
 		return 0;
 	}
-	devbname();
-	//printf("bname = %s", bname);
-	//printf("DName = %s\n", dname);
+	devbname(pathname);
 	NODE *newparent = path2node(dname);
+	//printf("%s\n", newparent->name);
 	if(newparent == NULL)
 	{
 		printf("Error: Path not found\n");
 		return 0;
 	}
-	NODE *newchild = newparent->child;
-	while(newchild->sibling)
+	if(bname == "/")
 	{
-		newchild = newchild->sibling;
+		printf("Error: Can't name new node '/'\n");
 	}
-	newchild->sibling = newnode(bname, 'd', newparent);
+	if(newparent->child != NULL)
+	{
+		NODE *newchild = newparent->child;
+		while(newchild->sibling)
+		{
+			newchild = newchild->sibling;
+		}
+		newchild->sibling = newnode(bname, 'd', newparent);
+		return 1;
+	}
+	else
+	{
+		newparent->child = newnode(bname, 'd', newparent);
+		return 1;
+	}
+}
+
+int creat(char *pathname)
+{
+	// Check for existing node with same name
+	if(path2node(pathname) != NULL)
+	{
+		// If the node exists return 0 and print error
+		printf("Error: Directory already exists\n");
+		return 0;
+	}
+	devbname(pathname);
+	NODE *newparent = path2node(dname);
+	//printf("%s\n", newparent->name);
+	if(newparent == NULL)
+	{
+		printf("Error: Path not found\n");
+		return 0;
+	}
+	if(bname == "/")
+	{
+		printf("Error: Can't name new node '/'\n");
+	}
+	if(newparent->child != NULL)
+	{
+		NODE *newchild = newparent->child;
+		while(newchild->sibling)
+		{
+			newchild = newchild->sibling;
+		}
+		newchild->sibling = newnode(bname, 'f', newparent);
+		return 1;
+	}
+	else
+	{
+		newparent->child = newnode(bname, 'f', newparent);
+		return 1;
+	}
 }
 
 

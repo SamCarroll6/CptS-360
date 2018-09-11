@@ -3,17 +3,17 @@
 int main(int argc, char* argv[])
 {
 	initroot();
-	/*
-	char *hold = "/one/two/three/four";
-	writetofile("myfile.txt");
-	readfromfile("myfile.txt");
-	int val = tokenize(hold);
-	printf("\n%s\n", hold);
-	printf("%d\n", val);	
-	hold = "newwords";
-	val = tokenize(hold);
-	printf("\n%s\n", hold);
-	printf("%d\n", val);
-	*/
-	mkdir("dir1");
+	cwd = root;
+	mkdir("/dir1");
+	mkdir("/dir2");
+	mkdir("/dir3");
+	mkdir("/dir2/dir4");
+	mkdir("/dir9/dir5");
+	mkdir("/");
+	creat("f1");
+	printf("First root child: %s\n", root->child->name);
+	printf("Second root child: %s\n", root->child->sibling->name);
+	printf("Third root child: %s\n", root->child->sibling->sibling->name);
+	printf("Nested child: %s -> %s\n", root->child->sibling->name, root->child->sibling->child->name);
+
 }
