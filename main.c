@@ -25,4 +25,10 @@ int main(int argc, char* argv[])
 		print = print->sibling;
 	}
 	printf("\nFile: %s  Type: %c\n", print->name, print->type);
+	printf("\n\nCD try:\n");
+	cd("dir2");
+	printf("CWD = %s\nCWD child = %s\n", cwd->name, cwd->child->name);
+	cd("/");
+	printf("CWD = %s\nCWD child = %s\n", cwd->name, cwd->child->name);
+
 }

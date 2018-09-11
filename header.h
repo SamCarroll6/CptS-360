@@ -288,7 +288,19 @@ int creat(char *pathname)
 	}
 }
 
+int cd(char *pathname)
+{
+	name[0] = NULL;
+	name[1] = NULL;
+	memset(&bname[0], NULL, sizeof(bname));
+	memset(&dname[0], NULL, sizeof(dname));
 
+	NODE *newcwd = path2node(pathname);
+	if(newcwd)
+	{
+		cwd = newcwd;
+	}
+}
 
 
 
