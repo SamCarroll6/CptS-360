@@ -130,11 +130,20 @@ int devbname(char *pathname)
 	strcpy(bname, name[n - 1]);       
 }
 
+/*
+ * Search child node of parent for a match to provided name
+ * helper for various command functions including mkdir and
+ * creat.
+*/
 NODE *search_child(NODE *parent, char *name)
 {
 	NODE *childlist = parent->child;	
+	// While childlist isn't Null/end of list
 	while(childlist)
 	{
+		// if current childlist node name equals the given name
+		// return the node if it matches, otherwise return 0 if 
+		// it doesn't exist.
 		if(strcmp(childlist->name, name) == 0)
 		{
 			return childlist;
@@ -147,6 +156,8 @@ NODE *search_child(NODE *parent, char *name)
 NODE *path2node(char *pathname)
 {
 	int numpath = 0;
+	// Set start node to either root or cwd
+	// based on pathname
 	if(pathname[0] == '/')
 	{
 		start = root;
@@ -155,22 +166,44 @@ NODE *path2node(char *pathname)
 	{
 		start = cwd;
 	}
+	// tokenize the path name to break it up into seperate names
 	numpath = tokenize(pathname);
-	NODE *p = cwd;
+	// Set new variable *p to start so start value doesnt get changed.
+	NODE *p = start;
 	for(int i = 0; i < numpath; i++)
 	{
+		// Search child for next stored name, if NULL return 0
+		// as directory does not currently exist
 		p = search_child(p, name[i]);
 		if(p == 0)
 		{
 			return 0;
+		}
+		// Return 0 and print error if file type in pathname 
+		// is not a directory type.
+		if(p->type != 'd')
+		{
+			// Check if matched name from search child is directory. 
+			// If it is a file it will return 1 so calling function 
+			// assumes that a matched name was found and won't make 
+			// a new one.
+			printf("Error: %s: Not a Directory\n", p->name);
+			return 1;
 		}	
 	}
+	// If appropriate path found return the last node
 	return p;
 }
 
 
 int mkdir(char *pathname)
 {
+	// Needs to reset first two values of name
+	// as well as bname and dname for reuse.
+	name[0] = NULL;
+	name[1] = NULL;
+	memset(&bname[0], NULL, sizeof(bname));
+	memset(&dname[0], NULL, sizeof(dname));
 	// Check for existing node with same name
 	if(path2node(pathname) != NULL)
 	{
@@ -189,6 +222,7 @@ int mkdir(char *pathname)
 	if(bname == "/")
 	{
 		printf("Error: Can't name new node '/'\n");
+		return 0;
 	}
 	if(newparent->child != NULL)
 	{
@@ -209,6 +243,12 @@ int mkdir(char *pathname)
 
 int creat(char *pathname)
 {
+	// Needs to reset first two values of name
+	// as well as bname and dname for reuse.
+	name[0] = NULL;
+	name[1] = NULL;
+	memset(&bname[0], NULL, sizeof(bname));
+	memset(&dname[0], NULL, sizeof(dname));
 	// Check for existing node with same name
 	if(path2node(pathname) != NULL)
 	{
@@ -217,6 +257,8 @@ int creat(char *pathname)
 		return 0;
 	}
 	devbname(pathname);
+	printf("dname %s for %s\n", dname, pathname);
+	printf("bname %s for %s\n", bname, pathname);
 	NODE *newparent = path2node(dname);
 	//printf("%s\n", newparent->name);
 	if(newparent == NULL)
@@ -227,6 +269,7 @@ int creat(char *pathname)
 	if(bname == "/")
 	{
 		printf("Error: Can't name new node '/'\n");
+		return 0;
 	}
 	if(newparent->child != NULL)
 	{
