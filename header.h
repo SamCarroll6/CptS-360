@@ -362,6 +362,48 @@ void pwdhelper(NODE *parentprint)
 	printf("%s/", parentprint->name);
 }
 
+int rmdir(char *pathname)
+{
+	printf("**** rmdir %s\n", pathname);
+	NODE *pathnode = path2node(pathname);
+	NODE *checkval = pathnode->parent;
+	if(pathnode == 0 || pathnode == 1)
+	{
+		return 0;
+	}
+	else if(checkval == pathnode)
+	{
+		printf("Error: Can't remove root\n");
+		return 0;
+	}
+	else if(pathnode->type != 'd')
+	{
+		printf("rmdir: failed to remove '%s': not a directory\n", pathnode->name);
+		return 0;
+	}
+	else if(pathnode->child)
+	{
+		printf("rmdir: failed to remove '%s': directory not empty\n", pathnode->name);
+		return 0;
+	}
+	if(checkval->child == pathnode)
+	{
+		checkval->child = pathnode->sibling;
+		free(pathnode);
+		return 1;
+	}
+	checkval = checkval->child;
+	while(strcmp(checkval->sibling->name, pathnode->name) != 0 && checkval)
+	{
+		checkval = checkval->sibling;
+	}
+	checkval->sibling = pathnode->sibling;
+	free(pathnode);
+	return 1;
+
+
+}
+
 
 
 

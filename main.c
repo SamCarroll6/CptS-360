@@ -30,4 +30,8 @@ int main(int argc, char* argv[])
 	pwd();
 	cd("/");
 	pwd();
+	printf("\n\nTry rmdir:\n");
+	rmdir("dir1");
+	rmdir("dir2");
+	cd("dir1");
 }
