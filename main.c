@@ -4,6 +4,35 @@ int main(int argc, char* argv[])
 {
 	initroot();
 	cwd = root;
+	char *token;
+	while(1)
+	{
+		printf("Command: ");
+		fgets(line, sizeof(line), stdin);
+		strtok(line, "\n");
+		token = strtok(line, " ");
+		if(strcmp(token, line) != 0)
+		{
+			token = strtok(NULL, " ");
+		}
+		strcpy(pathname, token);
+		strcpy(command, line);
+		printf("Command: %s\n", command);
+		printf("pathname: %s\n", pathname);
+		//printf("Command: %s\nPathname: %s\n", command, pathname);
+		if(strcmp(line, "clear") == 0)
+		{
+			clear();
+		}
+		if(strcmp(line, "quit") == 0)
+		{
+			return 0;
+		}
+	}
+}
+
+void tester(void)
+{
 	printf("Mkdir/creat files test:\n");
 	mkdir("/dir1");
 	mkdir("/dir2");

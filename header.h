@@ -34,6 +34,7 @@ int initroot(void)
 	cwd = root;
 	root->sibling = root;
 	root->parent = root;
+	printf("Root initialized OK\n");
 }
 
 /*
@@ -452,5 +453,7 @@ int rm(char *pathname)
 	return 1;
 }
 
-
-
+void clear(void)
+{
+	system("clear");
+}
