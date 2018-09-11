@@ -198,17 +198,23 @@ NODE *path2node(char *pathname)
 
 int mkdir(char *pathname)
 {
+	printf("**** mkdir %s\n", pathname);
 	// Needs to reset first two values of name
 	// as well as bname and dname for reuse.
 	name[0] = NULL;
 	name[1] = NULL;
 	memset(&bname[0], NULL, sizeof(bname));
 	memset(&dname[0], NULL, sizeof(dname));
+	NODE *errcheck = path2node(pathname);
 	// Check for existing node with same name
-	if(path2node(pathname) != NULL)
+	if(errcheck != NULL && errcheck != 1)
 	{
 		// If the node exists return 0 and print error
-		printf("Error: Directory already exists\n");
+		printf("Error: %s: Directory already exists\n", pathname);
+		return 0;
+	}
+	else if(errcheck == 1)
+	{
 		return 0;
 	}
 	devbname(pathname);
@@ -216,7 +222,7 @@ int mkdir(char *pathname)
 	//printf("%s\n", newparent->name);
 	if(newparent == NULL)
 	{
-		printf("Error: Path not found\n");
+		printf("Error: %s: Path not found\n", pathname);
 		return 0;
 	}
 	if(bname == "/")
@@ -243,27 +249,31 @@ int mkdir(char *pathname)
 
 int creat(char *pathname)
 {
+	printf("**** creat %s\n", pathname);
 	// Needs to reset first two values of name
 	// as well as bname and dname for reuse.
 	name[0] = NULL;
 	name[1] = NULL;
 	memset(&bname[0], NULL, sizeof(bname));
 	memset(&dname[0], NULL, sizeof(dname));
+	NODE *errcheck = path2node(pathname);
 	// Check for existing node with same name
-	if(path2node(pathname) != NULL)
+	if(errcheck != NULL && errcheck != 1)
 	{
 		// If the node exists return 0 and print error
-		printf("Error: Directory already exists\n");
+		printf("Error: %s: Directory already exists\n", pathname);
+		return 0;
+	}
+	else if(errcheck == 1)
+	{
 		return 0;
 	}
 	devbname(pathname);
-	printf("dname %s for %s\n", dname, pathname);
-	printf("bname %s for %s\n", bname, pathname);
 	NODE *newparent = path2node(dname);
 	//printf("%s\n", newparent->name);
 	if(newparent == NULL)
 	{
-		printf("Error: Path not found\n");
+		printf("Error: %s: Path not found\n", pathname);
 		return 0;
 	}
 	if(bname == "/")
@@ -290,20 +300,67 @@ int creat(char *pathname)
 
 int cd(char *pathname)
 {
+	printf("**** cd %s\n", pathname);
 	name[0] = NULL;
 	name[1] = NULL;
 	memset(&bname[0], NULL, sizeof(bname));
 	memset(&dname[0], NULL, sizeof(dname));
 
 	NODE *newcwd = path2node(pathname);
-	if(newcwd)
+	if(newcwd == 1)
+	{
+		return 0;
+	}
+	else if(newcwd && newcwd->type == 'd')
 	{
 		cwd = newcwd;
+		return 1;
+	}
+	else if(newcwd == NULL)
+	{
+		printf("Error: Path does not exist\n");
+		return 0;
 	}
 }
 
+void ls(void)
+{
+	printf("**** ls ****\n");
+	if(cwd->child)
+	{
+		NODE *childptr = cwd->child;
+		while(childptr)
+		{
+			printf("%c\t%s\n", childptr->type, childptr->name);
+			childptr = childptr->sibling;
+		}
+	}
+}
 
+void pwd(void)
+{
+	printf("**** pwd ****\n");
+	if(cwd != root)
+	{
+		pwdhelper(cwd->parent);
+		printf("%s\n", cwd->name);
+	}
+	else
+	{
+		printf("/root\n");
+	}
+}
 
+void pwdhelper(NODE *parentprint)
+{
+	if(parentprint == parentprint->parent)
+	{
+		printf("/root/");
+		return;
+	}
+	pwdhelper(parentprint->parent);
+	printf("%s/", parentprint->name);
+}
 
 
 
