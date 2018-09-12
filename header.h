@@ -180,6 +180,7 @@ int devbname(char *pathname)
 	}
 	for(i; i < n-1; i++)
 	{
+		strcat(dname, "/");
 		strcat(dname, name[i]);
 	}
 	strcpy(bname, name[n - 1]);       
@@ -277,6 +278,8 @@ int mkdir(char *pathname)
 	//printf("%s\n", newparent->name);
 	if(newparent == NULL)
 	{
+		printf("dname = %s\n", dname);
+		printf("bname = %s\n", bname);
 		printf("Error: %s: Path not found\n", pathname);
 		return 0;
 	}
