@@ -46,8 +46,7 @@ int save(char * filename)
 	fp = fopen(filename,"w");
 	if(fp)
 	{
-		
-		// TODO print full tree to file for storage
+		traverse(root, fp);
 		fclose(fp);
 		printf("---- save OK ----\n");
 		return 1;
@@ -56,15 +55,40 @@ int save(char * filename)
 	return 0;
 }
 
-int savehelp(NODE *parentprint, FILE *fp, char type)
+void traverse(NODE *parentprint, FILE *fp)
+{
+	NODE *passer = parentprint;
+	savehelp(passer, fp, parentprint->type);
+	if(parentprint->child)
+	{
+		fprintf(fp, "\n");
+		passer = parentprint->child;
+		traverse(passer, fp);
+	}
+	if(parentprint->sibling && parentprint->parent != parentprint)
+	{
+		fprintf(fp, "\n");
+		passer = parentprint->sibling;
+		traverse(passer, fp);
+	}
+}
+
+void savehelp(NODE *parentprint, FILE *fp, char type)
 {
 	if(parentprint == parentprint->parent)
 	{
-		fprintf(fp, "%c ", type);
+		fprintf(fp, "%c %s", type, parentprint->name);
 		return;
 	}
-	savehelp(parentprint->parent, fp);
-	fprintf(fp, "/%s", parentprint->name);
+	savehelp(parentprint->parent, fp, type);
+	if(parentprint->parent != root)
+	{
+		fprintf(fp, "/%s", parentprint->name);
+	}
+	else
+	{
+		fprintf(fp, "%s", parentprint->name);
+	}
 }
 
 /*
