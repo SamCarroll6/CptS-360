@@ -476,3 +476,33 @@ void help(void)
 	printf("============================================================\n");
 }
 
+char *pars[7] = {"mkdir", "creat", "rm", "rmdir", "cd", "save", "reload"};
+char *nopars[4] = {"help", "ls", "clear", "pwd"};
+
+int findspot1(char *commandname)
+{
+	int i = 0;
+	for(i; i < 7; i++)
+	{
+		if(strcmp(commandname, pars[i]) == 0)
+		{
+			return i;
+		}
+	}
+	printf("Unrecognized command\n");
+	return -1;
+}
+
+int findspot2(char *commandname)
+{
+	int i = 0;
+	for(i; i < 4; i++)
+	{
+		if(strcmp(commandname, nopars[i]) == 0)
+		{
+			return i;
+		}
+	}
+	printf("Unrecognized command\n");
+	return -1;
+}

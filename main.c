@@ -26,27 +26,41 @@ int readinput(void)
 }
 
 // Array of function pointers with parameters
-int (*Farrpars[7]) = {mkdir, creat, rm, rmdir, cd, save, reload};
+int (*Farrpars[7])(char *pathname) = {mkdir, creat, rm, rmdir, cd, save, reload};
 // Array of function pointers with no parameters
-void (*Farrnon[4]) = {help, ls, clear, pwd};
+void (*Farrnon[4])(void) = {help, ls, clear, pwd};
 
 int main(int argc, char* argv[])
 {
 	// Initialize root node and set cwd to root
 	initroot();
 	cwd = root;
+	int val = -1;
 	// Runs program, exits if quit command is entered.
 	while(1)
 	{
 		readinput();
-		if(strcmp(command, "clear") == 0)
+		if(pathname[0] != NULL)
 		{
-			clear();
+			val = findspot1(command);
+			if(val >= 0 && val < 7)
+			{
+				(*Farrpars[val])(pathname);
+			}
 		}
-		if(strcmp(command, "quit") == 0)
+		else if(strcmp(command, "quit") == 0)
 		{
 			return 0;
 		}	
+		else if(pathname[0] == NULL)
+		{
+			val = findspot2(command);
+			if(val >= 0 && val < 4)
+			{
+				(*Farrnon[val])();
+			}
+		}
+		
 	}
 }
 
