@@ -51,6 +51,7 @@ int save(char * filename)
 		printf("---- save OK ----\n");
 		return 1;
 	}
+	printf("Unable to find file\n");
 	return 0;
 }
 
@@ -62,12 +63,26 @@ int save(char * filename)
 int reload(char *filename)
 {
 	char value[128];
+	char *token;
 	int i = 0;
 	fp = fopen(filename, "r");
 	if(fp)
 	{
 		while(fgets(value,128,fp) != 0)
 		{
+			strtok(value, "\n");
+			token = strtok(value, " ");
+			token = strtok(NULL, " ");
+			if(strcmp(value, "D") == 0 || strcmp(value, "d") == 0)
+			{
+				printf("token = %s\n", token);
+				mkdir(token);
+			}
+			else if(strcmp(value, "F") == 0 || strcmp(value, "f") == 0)
+			{
+				printf("creat token = %s\n", token);
+				creat(token);
+			}
 			// TODO add code for reading contents from file and 
 			// adding to kernel tree
 		}
@@ -75,6 +90,7 @@ int reload(char *filename)
 		printf("---- reload OK ----\n");
 		return 1;
 	}
+	printf("Unable to find file\n");
 	return 0;
 }
 
@@ -329,6 +345,8 @@ int cd(char *pathname)
 		printf("Error: Path does not exist\n");
 		return 0;
 	}
+	printf("Error: %s: Path contains non directory type\n", pathname);
+	return 0;
 }
 
 void ls(void)
@@ -477,7 +495,7 @@ void help(void)
 }
 
 char *pars[7] = {"mkdir", "creat", "rm", "rmdir", "cd", "save", "reload"};
-char *nopars[4] = {"help", "ls", "clear", "pwd"};
+char *nopars[5] = {"help", "ls", "clear", "pwd", "?"};
 
 int findspot1(char *commandname)
 {
@@ -496,7 +514,7 @@ int findspot1(char *commandname)
 int findspot2(char *commandname)
 {
 	int i = 0;
-	for(i; i < 4; i++)
+	for(i; i < 5; i++)
 	{
 		if(strcmp(commandname, nopars[i]) == 0)
 		{
