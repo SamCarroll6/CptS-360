@@ -1,36 +1,51 @@
 #include "header.h"
 
-int main(int argc, char* argv[])
+int readinput(void)
 {
-	initroot();
-	cwd = root;
 	char *token;
-	while(1)
+	// Reset command and pathname global variables
+	memset(&command[0], NULL, sizeof(command));
+	memset(&pathname[0], NULL, sizeof(pathname));
+	printf("Command: ");
+	// read in line
+	fgets(line, sizeof(line), stdin);
+	// Remove \n read in with fgets
+	strtok(line, "\n");
+	token = strtok(line, " ");
+	// Find value which will represent pathname
+	token = strtok(NULL, " ");
+	// if token or line is null don't strcpy it
+	if(token)
 	{
-		printf("Command: ");
-		fgets(line, sizeof(line), stdin);
-		strtok(line, "\n");
-		token = strtok(line, " ");
-		if(strcmp(token, line) != 0)
-		{
-			token = strtok(NULL, " ");
-		}
 		strcpy(pathname, token);
+	}
+	if(line)
+	{
 		strcpy(command, line);
-		printf("Command: %s\n", command);
-		printf("pathname: %s\n", pathname);
-		//printf("Command: %s\nPathname: %s\n", command, pathname);
-		if(strcmp(line, "clear") == 0)
-		{
-			clear();
-		}
-		if(strcmp(line, "quit") == 0)
-		{
-			return 0;
-		}
 	}
 }
 
+int main(int argc, char* argv[])
+{
+	// Initialize root node and set cwd to root
+	initroot();
+	cwd = root;
+	// Runs program, exits if quit command is entered.
+	while(1)
+	{
+		readinput();
+		if(strcmp(command, "clear") == 0)
+		{
+			clear();
+		}
+		if(strcmp(command, "quit") == 0)
+		{
+			return 0;
+		}	
+	}
+}
+
+// Early test function to see how functions perform. 
 void tester(void)
 {
 	printf("Mkdir/creat files test:\n");
@@ -77,3 +92,4 @@ void tester(void)
 	// rm("f1");
 	// ls();
 }
+

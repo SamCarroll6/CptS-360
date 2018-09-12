@@ -15,6 +15,10 @@ char dname[64], bname[64];
 char *name[100];
 int n;
 FILE *fp;
+// Array of function pointers with parameters
+int (*Farrpars[7]) = {mkdir, creat, rm, rmdir, cd, save, reload};
+// Array of function pointers with no parameters
+int (*Farrnon[4]) = {help, ls, clear, pwd}
 
 NODE *newnode(char *name, char type, NODE *parent)
 {
@@ -41,13 +45,14 @@ int initroot(void)
  * Writes to file to store contents of most recent
  * tree
  */
-int writetofile(char * filename)
+int save(char * filename)
 {
 	fp = fopen(filename,"w");
 	if(fp)
 	{
 		// TODO print full tree to file for storage
 		fclose(fp);
+		printf("---- save OK ----\n");
 		return 1;
 	}
 	return 0;
@@ -58,7 +63,7 @@ int writetofile(char * filename)
  * File will contain previously saved information
  * from most recent tree that was saved
  */
-int readfromfile(char *filename)
+int reload(char *filename)
 {
 	char value[128];
 	int i = 0;
@@ -71,6 +76,7 @@ int readfromfile(char *filename)
 			// adding to kernel tree
 		}
 		fclose(fp);
+		printf("---- reload OK ----\n");
 		return 1;
 	}
 	return 0;
@@ -239,11 +245,13 @@ int mkdir(char *pathname)
 			newchild = newchild->sibling;
 		}
 		newchild->sibling = newnode(bname, 'd', newparent);
+		printf("---- mkdir OK ----\n");
 		return 1;
 	}
 	else
 	{
 		newparent->child = newnode(bname, 'd', newparent);
+		printf("---- mkdir OK ----\n");
 		return 1;
 	}
 }
@@ -290,11 +298,13 @@ int creat(char *pathname)
 			newchild = newchild->sibling;
 		}
 		newchild->sibling = newnode(bname, 'f', newparent);
+		printf("---- creat OK ----\n");
 		return 1;
 	}
 	else
 	{
 		newparent->child = newnode(bname, 'f', newparent);
+		printf("---- creat OK ----\n");
 		return 1;
 	}
 }
@@ -315,6 +325,7 @@ int cd(char *pathname)
 	else if(newcwd && newcwd->type == 'd')
 	{
 		cwd = newcwd;
+		printf("---- cd OK ----\n");
 		return 1;
 	}
 	else if(newcwd == NULL)
@@ -400,6 +411,7 @@ int rmdir(char *pathname)
 	{
 		checkval->child = pathnode->sibling;
 		free(pathnode);
+		printf("---- rmdir OK ----\n");
 		return 1;
 	}
 	// Find node before pathnode in sibling linked list
@@ -411,6 +423,7 @@ int rmdir(char *pathname)
 	// Remove pathnode and set checkval sibling node to pathnodes sibling
 	checkval->sibling = pathnode->sibling;
 	free(pathnode);
+	printf("---- rmdir OK ----\n");
 	return 1;
 }
 
@@ -439,6 +452,7 @@ int rm(char *pathname)
 	{
 		checkval->child = pathnode->sibling;
 		free(pathnode);
+		printf("---- rm OK ----\n");
 		return 1;
 	}
 	// Find node before pathnode in sibling linked list
@@ -450,6 +464,7 @@ int rm(char *pathname)
 	// Remove pathnode and set checkval sibling node to pathnodes sibling
 	checkval->sibling = pathnode->sibling;
 	free(pathnode);
+	printf("---- rm OK ----\n");
 	return 1;
 }
 
@@ -457,3 +472,4 @@ void clear(void)
 {
 	system("clear");
 }
+
