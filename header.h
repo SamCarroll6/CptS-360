@@ -46,6 +46,7 @@ int save(char * filename)
 	fp = fopen(filename,"w");
 	if(fp)
 	{
+		
 		// TODO print full tree to file for storage
 		fclose(fp);
 		printf("---- save OK ----\n");
@@ -53,6 +54,17 @@ int save(char * filename)
 	}
 	printf("Unable to find file\n");
 	return 0;
+}
+
+int savehelp(NODE *parentprint, FILE *fp, char type)
+{
+	if(parentprint == parentprint->parent)
+	{
+		fprintf(fp, "%c ", type);
+		return;
+	}
+	savehelp(parentprint->parent, fp);
+	fprintf(fp, "/%s", parentprint->name);
 }
 
 /*
