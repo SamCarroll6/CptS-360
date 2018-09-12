@@ -25,6 +25,11 @@ int readinput(void)
 	}
 }
 
+// Array of function pointers with parameters
+int (*Farrpars[7]) = {mkdir, creat, rm, rmdir, cd, save, reload};
+// Array of function pointers with no parameters
+void (*Farrnon[4]) = {help, ls, clear, pwd};
+
 int main(int argc, char* argv[])
 {
 	// Initialize root node and set cwd to root

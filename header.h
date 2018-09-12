@@ -15,10 +15,6 @@ char dname[64], bname[64];
 char *name[100];
 int n;
 FILE *fp;
-// Array of function pointers with parameters
-int (*Farrpars[7]) = {mkdir, creat, rm, rmdir, cd, save, reload};
-// Array of function pointers with no parameters
-int (*Farrnon[4]) = {help, ls, clear, pwd}
 
 NODE *newnode(char *name, char type, NODE *parent)
 {
@@ -471,5 +467,12 @@ int rm(char *pathname)
 void clear(void)
 {
 	system("clear");
+}
+
+void help(void)
+{
+	printf("=========================== MENU ===========================\n");
+	printf("mkdir rmdir ls  cd  pwd  creat  rm  save reload  quit  clear\n");
+	printf("============================================================\n");
 }
 
