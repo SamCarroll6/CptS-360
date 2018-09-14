@@ -412,7 +412,7 @@ void pwd(void)
 	}
 	else
 	{
-		printf("/root\n");
+		printf("/\n");
 	}
 }
 
@@ -420,7 +420,7 @@ void pwdhelper(NODE *parentprint)
 {
 	if(parentprint == parentprint->parent)
 	{
-		printf("/root/");
+		printf("/");
 		return;
 	}
 	pwdhelper(parentprint->parent);
@@ -563,6 +563,14 @@ int findspot2(char *commandname)
 		if(strcmp(commandname, nopars[i]) == 0)
 		{
 			return i;
+		}
+	}
+	for(i; i < 7; i++)
+	{
+		if(strcmp(commandname, pars[i]) == 0)
+		{
+			printf("%s Missing Operand\n");
+			return -1;
 		}
 	}
 	printf("Unrecognized command\n");
