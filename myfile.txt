@@ -1,7 +1,4 @@
 d /
 d /d1
+d /d1/d2
 f /d1/f1
-d /d2
-f /d2/f2
-d /d3
-f /d3/f3

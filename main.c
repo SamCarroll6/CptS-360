@@ -51,6 +51,8 @@ int main(int argc, char* argv[])
 		}
 		else if(strcmp(command, "quit") == 0)
 		{
+			Quit(root);
+			printf("\n");
 			return 0;
 		}	
 		else if(pathname[0] == NULL)

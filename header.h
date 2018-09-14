@@ -434,6 +434,11 @@ int rmdir(char *pathname)
 	NODE *pathnode = path2node(pathname);
 	// if pathname doesn't exist or somewhere in the pathname
 	// a file is referenced as a directory
+	if(pathnode == cwd)
+	{
+		printf("Error: Can't remove Current Working Directory\n");
+		return 0;
+	}
 	if(pathnode == 0 || pathnode == 1)
 	{
 		return 0;
@@ -562,4 +567,41 @@ int findspot2(char *commandname)
 	}
 	printf("Unrecognized command\n");
 	return -1;
+}
+
+
+void Quit(NODE *parentprint)
+{
+	NODE *passer = parentprint;
+	Quithelp(passer, parentprint->type);
+	if(parentprint->child)
+	{
+		printf("\n");
+		passer = parentprint->child;
+		Quit(passer);
+	}
+	if(parentprint->sibling && parentprint->parent != parentprint)
+	{
+		printf("\n");
+		passer = parentprint->sibling;
+		Quit(passer);
+	}
+}
+
+void Quithelp(NODE *parentprint, char type)
+{
+	if(parentprint == parentprint->parent)
+	{
+		printf("%c %s", type, parentprint->name);
+		return;
+	}
+	Quithelp(parentprint->parent, type);
+	if(parentprint->parent != root)
+	{
+		printf("/%s", parentprint->name);
+	}
+	else
+	{
+		printf("%s", parentprint->name);
+	}
 }
