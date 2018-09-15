@@ -1,5 +1,9 @@
 #include "header.h"
 
+/*
+ * This function handles reading in the users input and tokenizing
+ * that input into either a commandname or pathname.
+ */ 
 int readinput(void)
 {
 	char *token;
@@ -41,6 +45,8 @@ int main(int argc, char* argv[])
 	while(1)
 	{
 		readinput();
+		// if pathname isnt NULL check the array that takes 
+		// parameters
 		if(pathname[0] != NULL)
 		{
 			val = findspot1(command);
@@ -49,12 +55,15 @@ int main(int argc, char* argv[])
 				(*Farrpars[val])(pathname);
 			}
 		}
+		// If command is quit run quit function and exit the program
 		else if(strcmp(command, "quit") == 0)
 		{
 			Quit(root);
 			printf("\n");
 			return 0;
 		}	
+		// If pathname is NULL search array with no parameter functions
+		// for given command
 		else if(pathname[0] == NULL)
 		{
 			val = findspot2(command);

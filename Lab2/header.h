@@ -54,17 +54,26 @@ int save(char * filename)
 	printf("Unable to find file\n");
 	return 0;
 }
-
+/*
+ * Helper function for save, traverses the tree to 
+ * print nodes in appropriate order
+ */
 void traverse(NODE *parentprint, FILE *fp)
 {
 	NODE *passer = parentprint;
+	// Prints current nodes information, following if statements
+	// check for the next node in the order.
 	savehelp(passer, fp, parentprint->type);
+	// Check for child node and traverse that if available.
 	if(parentprint->child)
 	{
 		fprintf(fp, "\n");
 		passer = parentprint->child;
 		traverse(passer, fp);
 	}
+	// Make sure node at this point isn't the root as that leads to
+	// endless loop. checks for a sibling and runs traverse on that
+	// sibling node if it exists
 	if(parentprint->sibling && parentprint->parent != parentprint)
 	{
 		fprintf(fp, "\n");
@@ -73,13 +82,23 @@ void traverse(NODE *parentprint, FILE *fp)
 	}
 }
 
+
+/*
+ * Helper function for printing the full tree.
+ * Does the actual printing portion for each node. 
+ */
 void savehelp(NODE *parentprint, FILE *fp, char type)
 {
+	// Base case, prints a / when it gets back to root
+	// as well as prints the type for reloading
 	if(parentprint == parentprint->parent)
 	{
 		fprintf(fp, "%c %s", type, parentprint->name);
 		return;
 	}
+	// Recursively call this function until root is hit, then print root
+	// and follow the children nodes back up the recursive tree printing
+	// each one along the way until you hit the starting node.
 	savehelp(parentprint->parent, fp, type);
 	if(parentprint->parent != root)
 	{
@@ -119,8 +138,6 @@ int reload(char *filename)
 				printf("creat token = %s\n", token);
 				creat(token);
 			}
-			// TODO add code for reading contents from file and 
-			// adding to kernel tree
 		}
 		fclose(fp);
 		printf("---- reload OK ----\n");
@@ -209,6 +226,13 @@ NODE *search_child(NODE *parent, char *name)
 	return 0;
 }
 
+
+/*
+ * Uses a pathname input to find the proper route back to 
+ * the final listed node in the path and returns a pointer to
+ * that found node. Or returns 0 or 1 depending on the reason it
+ * couldn't find the appropriate node. 
+ */
 NODE *path2node(char *pathname)
 {
 	int numpath = 0;
@@ -251,7 +275,11 @@ NODE *path2node(char *pathname)
 	return p;
 }
 
-
+/*
+ * make directory function, add the final name supplied in pathname to 
+ * the end of the given path as a new directory if the given path 
+ * exists.
+ */
 int mkdir(char *pathname)
 {
 	printf("**** mkdir %s\n", pathname);
@@ -275,7 +303,7 @@ int mkdir(char *pathname)
 	}
 	devbname(pathname);
 	NODE *newparent = path2node(dname);
-	//printf("%s\n", newparent->name);
+	// Path not found as path2node returned 0.
 	if(newparent == NULL)
 	{
 		printf("dname = %s\n", dname);
@@ -283,11 +311,15 @@ int mkdir(char *pathname)
 		printf("Error: %s: Path not found\n", pathname);
 		return 0;
 	}
+	// Can't name directory same name as root no matter where
+	// it is.
 	if(bname == "/")
 	{
 		printf("Error: Can't name new node '/'\n");
 		return 0;
 	}
+	// If the path exists find the end of sibling linked list
+	// and add in new node with given name 
 	if(newparent->child != NULL)
 	{
 		NODE *newchild = newparent->child;
@@ -328,19 +360,22 @@ int creat(char *pathname)
 	{
 		return 0;
 	}
+	// Seperate pathname from name of node that needs
+	// to be returned
 	devbname(pathname);
 	NODE *newparent = path2node(dname);
-	//printf("%s\n", newparent->name);
 	if(newparent == NULL)
 	{
 		printf("Error: %s: Path not found\n", pathname);
 		return 0;
 	}
+	// New node can't share name with root
 	if(bname == "/")
 	{
 		printf("Error: Can't name new node '/'\n");
 		return 0;
 	}
+	// Make new node at end of sibling linked list
 	if(newparent->child != NULL)
 	{
 		NODE *newchild = newparent->child;
@@ -352,6 +387,7 @@ int creat(char *pathname)
 		printf("---- creat OK ----\n");
 		return 1;
 	}
+	// If there are no sibling nodes make the child the new node
 	else
 	{
 		newparent->child = newnode(bname, 'f', newparent);
@@ -360,25 +396,32 @@ int creat(char *pathname)
 	}
 }
 
+/*
+ * Change directories following a given pathname
+ */ 
 int cd(char *pathname)
 {
 	printf("**** cd %s\n", pathname);
 	name[0] = NULL;
 	name[1] = NULL;
+	// Make sure bname and dname will be read as NULL
 	memset(&bname[0], NULL, sizeof(bname));
 	memset(&dname[0], NULL, sizeof(dname));
-
+	// Get path to node you want to change to
 	NODE *newcwd = path2node(pathname);
+	// if new node is a file don't change
 	if(newcwd == 1)
 	{
 		return 0;
 	}
+	// if newcwd is not NULL and type is directory cwd change to that node
 	else if(newcwd && newcwd->type == 'd')
 	{
 		cwd = newcwd;
 		printf("---- cd OK ----\n");
 		return 1;
 	}
+	// If newcwd path does not exist return 0
 	else if(newcwd == NULL)
 	{
 		printf("Error: Path does not exist\n");
@@ -388,12 +431,17 @@ int cd(char *pathname)
 	return 0;
 }
 
+/*
+ * List contents of current working directory
+ */
 void ls(void)
 {
 	printf("**** ls ****\n");
+	// If cwd contains child nodes print them
 	if(cwd->child)
 	{
 		NODE *childptr = cwd->child;
+		// traverse child nodes
 		while(childptr)
 		{
 			printf("%c\t%s\n", childptr->type, childptr->name);
@@ -402,11 +450,17 @@ void ls(void)
 	}
 }
 
+/*
+ * Print the path to the current working directory starting with root
+ */
 void pwd(void)
 {
 	printf("**** pwd ****\n");
 	if(cwd != root)
 	{
+		// Done with recursive helper function to print string starting
+		// with roo insead of starting with cwd. 
+		// EX: /d1/d2 insead of d2/d1/
 		pwdhelper(cwd->parent);
 		printf("%s\n", cwd->name);
 	}
@@ -415,18 +469,25 @@ void pwd(void)
 		printf("/\n");
 	}
 }
-
+/*
+ * Recursive helper function for pwd function
+ */
 void pwdhelper(NODE *parentprint)
 {
+	// Base case of hit root node
 	if(parentprint == parentprint->parent)
 	{
 		printf("/");
 		return;
 	}
+	// If not at root make recursive call
 	pwdhelper(parentprint->parent);
 	printf("%s/", parentprint->name);
 }
 
+/*
+ * Remove a directory only if type = d and the directory is empty.
+ */
 int rmdir(char *pathname)
 {
 	printf("**** rmdir %s\n", pathname);
@@ -439,6 +500,7 @@ int rmdir(char *pathname)
 		printf("Error: Can't remove Current Working Directory\n");
 		return 0;
 	}
+	// If node at end of path doesnt exist or is file type return NULL
 	if(pathnode == 0 || pathnode == 1)
 	{
 		return 0;
@@ -485,6 +547,9 @@ int rmdir(char *pathname)
 	return 1;
 }
 
+/*
+ * Similar to rmdir but only removes nodes with type file
+ */
 int rm(char *pathname)
 {
 	printf("**** rm %s\n", pathname);
@@ -526,11 +591,17 @@ int rm(char *pathname)
 	return 1;
 }
 
+/*
+ * Simply clears the screen of content
+ */
 void clear(void)
 {
 	system("clear");
 }
 
+/*
+ * Prints menu containing each command
+ */ 
 void help(void)
 {
 	printf("=========================== MENU ===========================\n");
@@ -538,9 +609,19 @@ void help(void)
 	printf("============================================================\n");
 }
 
+// String arrays containing the names of every function, matches with users 
+// command input and returns the place in array to be used in the function
+// pointer arrays located in main.
+// One is for functions that contain parameters, the other is for those with 
+// void parameters (pars = parameters, nopars = no parameters).
 char *pars[7] = {"mkdir", "creat", "rm", "rmdir", "cd", "save", "reload"};
 char *nopars[5] = {"help", "ls", "clear", "pwd", "?"};
 
+/*
+ * Function searches pars string array for a match with provided commandname
+ * and returns the spot in the array it was found which matches with that
+ * functions placement in the function pointers array in main.
+ */
 int findspot1(char *commandname)
 {
 	int i = 0;
@@ -551,13 +632,21 @@ int findspot1(char *commandname)
 			return i;
 		}
 	}
+	// If it doesnt match any functions it returns error and -1
 	printf("Unrecognized command\n");
 	return -1;
 }
 
+/*
+ * Function searches nopars string array for a match with provided commandname
+ * and returns the spot in the array it was found which matches with that
+ * functions placement in the function pointers array in main.
+ */
+
 int findspot2(char *commandname)
 {
 	int i = 0;
+	// Checks for any matches in nopars array
 	for(i; i < 5; i++)
 	{
 		if(strcmp(commandname, nopars[i]) == 0)
@@ -565,6 +654,8 @@ int findspot2(char *commandname)
 			return i;
 		}
 	}
+	// checks pars array to provide error telling them to add parameters
+	// if it matches one of the other parameter functions
 	for(i; i < 7; i++)
 	{
 		if(strcmp(commandname, pars[i]) == 0)
@@ -573,11 +664,14 @@ int findspot2(char *commandname)
 			return -1;
 		}
 	}
+	// If command doesn't match return -1
 	printf("Unrecognized command\n");
 	return -1;
 }
 
-
+/*
+ * Prints the final tree to the screen. 
+ */
 void Quit(NODE *parentprint)
 {
 	NODE *passer = parentprint;
@@ -596,6 +690,10 @@ void Quit(NODE *parentprint)
 	}
 }
 
+/* 
+ * Recursive helper function for the quit function, helps display the pathname 
+ * for each node in the tree.
+ */
 void Quithelp(NODE *parentprint, char type)
 {
 	if(parentprint == parentprint->parent)
