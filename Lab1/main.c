@@ -1,9 +1,9 @@
 /*
 * Lab 1 for CptS 360
-* Work by: Samuel Carroll, starting code provided by Dr. K.C.
-* Wang
-*
-*
+* Work by: Samuel Carroll, starting code provided by Dr. K.C. Wang
+* 
+* Must be compiled in 32 bit architecture to work, the command
+* "gcc -m32 main.c ts.s" will work in Linux.
 *
 */
 
