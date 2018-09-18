@@ -30,9 +30,9 @@ int readinput(void)
 }
 
 // Array of function pointers with parameters
-int (*Farrpars[7])(char *pathname) = {mkdir, creat, rm, rmdir, cd, save, reload};
+int (*Farrpars[8])(char *pathname) = {mkdir, creat, rm, rmdir, cd, save, reload, lspar};
 // Array of function pointers with no parameters
-void (*Farrnon[5])(void) = {help, ls, clear, pwd, help};
+void (*Farrnon[6])(void) = {help, ls, clear, pwd, help, cdvoid};
 
 int main(int argc, char* argv[])
 {
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 		if(pathname[0] != NULL)
 		{
 			val = findspot1(command);
-			if(val >= 0 && val < 7)
+			if(val >= 0 && val < 8)
 			{
 				(*Farrpars[val])(pathname);
 			}
@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
 		else if(pathname[0] == NULL)
 		{
 			val = findspot2(command);
-			if(val >= 0 && val < 5)
+			if(val >= 0 && val < 6)
 			{
 				(*Farrnon[val])();
 			}
