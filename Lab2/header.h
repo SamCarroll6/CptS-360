@@ -431,6 +431,16 @@ int cd(char *pathname)
 	return 0;
 }
 
+int cdvoid(void)
+{
+	printf("**** cd ****\n");
+	cwd = root;
+	if(cwd == root)
+	{
+		printf("---- cd OK ----\n");
+	}
+}
+
 /*
  * List contents of current working directory
  */
@@ -450,6 +460,42 @@ void ls(void)
 	}
 }
 
+void lspar(char *pathname)
+{
+	printf("**** ls %s\n", pathname);
+	name[0] = NULL;
+	name[1] = NULL;
+	// Make sure bname and dname will be read as NULL
+	memset(&bname[0], NULL, sizeof(bname));
+	memset(&dname[0], NULL, sizeof(dname));
+	// Get path to node you want to change to
+	NODE *newls = path2node(pathname);
+	// if new node is a file don't change
+	if(newls == 1)
+	{
+		return 0;
+	}
+	// if newcwd is not NULL and type is directory cwd change to that node
+	else if(newls && newls->type == 'd')
+	{
+		NODE *childptr = newls->child;
+		// traverse child nodes
+		while(childptr)
+		{
+			printf("%c\t%s\n", childptr->type, childptr->name);
+			childptr = childptr->sibling;
+		}
+		return 1;
+	}
+	// If newcwd path does not exist return 0
+	else if(newls == NULL)
+	{
+		printf("Error: Path does not exist\n");
+		return 0;
+	}
+	printf("Error: %s: Path contains non directory type\n", pathname);
+	return 0;
+}
 /*
  * Print the path to the current working directory starting with root
  */
@@ -614,8 +660,8 @@ void help(void)
 // pointer arrays located in main.
 // One is for functions that contain parameters, the other is for those with 
 // void parameters (pars = parameters, nopars = no parameters).
-char *pars[7] = {"mkdir", "creat", "rm", "rmdir", "cd", "save", "reload"};
-char *nopars[5] = {"help", "ls", "clear", "pwd", "?"};
+char *pars[8] = {"mkdir", "creat", "rm", "rmdir", "cd", "save", "reload", "ls"};
+char *nopars[6] = {"help", "ls", "clear", "pwd", "?", "cd"};
 
 /*
  * Function searches pars string array for a match with provided commandname
@@ -625,7 +671,7 @@ char *nopars[5] = {"help", "ls", "clear", "pwd", "?"};
 int findspot1(char *commandname)
 {
 	int i = 0;
-	for(i; i < 7; i++)
+	for(i; i < 8; i++)
 	{
 		if(strcmp(commandname, pars[i]) == 0)
 		{
@@ -647,7 +693,7 @@ int findspot2(char *commandname)
 {
 	int i = 0;
 	// Checks for any matches in nopars array
-	for(i; i < 5; i++)
+	for(i; i < 6; i++)
 	{
 		if(strcmp(commandname, nopars[i]) == 0)
 		{
@@ -656,7 +702,7 @@ int findspot2(char *commandname)
 	}
 	// checks pars array to provide error telling them to add parameters
 	// if it matches one of the other parameter functions
-	for(i; i < 7; i++)
+	for(i; i < 8; i++)
 	{
 		if(strcmp(commandname, pars[i]) == 0)
 		{
