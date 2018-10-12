@@ -88,8 +88,7 @@ int cpf2f(char *f1, char *f2)
             close(fp2);
             return 1;
       }
-//   2. if f1 is LNK and f2 exists: reject
-//    I don't know why this says reject cp -r allows lnk and existing files?
+//   2. if f1 is LNK and f2 exists copy contents of link to reg. 
       if(S_ISREG(buf2.st_mode) && S_ISLNK(buf1.st_mode))
       {     
             struct stat symbuf;
@@ -105,14 +104,14 @@ int cpf2f(char *f1, char *f2)
             close(fp2);
             return 1;
       }
-//    if f1 is LNK and f2 does not exist: create LNK file f2 SAME as f1
+//    if f1 is LNK and f2 does not exist: create LNK file f2 SAME as f1.
       if(S_ISLNK(buf1.st_mode) && f2exist)
       {
             printf("INhere\n");
             symlink(basename(realpath(f1, NULL)), f2);
             return 1;
       }
-//    If both files regular files, or just 1 is regular and file 2 doesnt exist.       
+//    If both files regular files, or just file 1 is regular and file 2 doesnt exist.       
       if((S_ISREG(buf2.st_mode) && S_ISREG(buf1.st_mode)) || (S_ISREG(buf1.st_mode) && f2exist))
       {
             fp = open(f1, O_RDONLY);
@@ -126,20 +125,67 @@ int cpf2f(char *f1, char *f2)
             close(fp2);
             return 1;
       }
+      // If none of the above cases occured then something is wrong with input and we return 0.
       return 0;
 }
 
 int cpf2d(char *f1, char *f2)
 {
       printf("cpf2d\n");
+      DIR *dir = opendir(f2);
+      char *bname = (char*)malloc(sizeof(char) * strlen(basename(f1)));
+      bname = basename(f1);
+      struct dirent *sd;
+      if(dir == NULL)
+      {
+            printf("Error: Directory %s not found\n", f2);
+            return 0;
+      }
+      while((sd = readdir(dir)) != NULL)
+      {
+            if(!strcmp(f1, sd->d_name))
+            {
+                  int len = strlen(f2);
+
+                  if(f2[len - 1] == '/')
+                        strcat(f2,bname);
+                  else
+                  {
+                        strcat(f2, "/");
+                        strcat(f2, bname);
+                  }
+                  struct stat check;
+                  stat(f2, &check);
+                  if(S_ISDIR(check.st_mode))
+                  {
+                        close(dir);
+                        return cpf2f(f1, f2); 
+                  }
+                  else
+                  {
+                        close(dir);
+                        return cpf2f(f1, f2); 
+                  }
+            }
+      }
+      int len = strlen(f2);
+      if(f2[len - 1] == '/')
+            strcat(f2,bname);
+      else
+      {
+            strcat(f2, "/");
+            strcat(f2, bname);
+      }
+      close(dir);
+      return cpf2f(f1, f2);
 //   1. search DIR f2 for basename(f1)
 //      (use opendir(), readdir())
-     // x=basename(f1); 
-     // if x not in f2/ ==>        cpf2f(f1, f2/x)
-     // if x already in f2/: 
-     //      if f2/x is a file ==> cpf2f(f1, f2/x)
-     //      if f2/x is a DIR  ==> cpf2d(f1, f2/x)
-
+//       x=basename(f1); 
+// if x not in f2/ ==>        cpf2f(f1, f2/x)
+// if x already in f2/: 
+//      if f2/x is a file ==> cpf2f(f1, f2/x)
+//      if f2/x is a DIR  ==> cpf2d(f1, f2/x)
+      
 }
 
 
