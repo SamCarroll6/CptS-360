@@ -109,13 +109,24 @@ int cpf2f(char *f1, char *f2)
       if(S_ISLNK(buf1.st_mode) && f2exist)
       {
             printf("INhere\n");
-            //symlink(f1, f2);
             symlink(basename(realpath(f1, NULL)), f2);
+            return 1;
       }
-//   4:
-//      open f1 for READ;
-//      open f2 for O_WRONLY|O_CREAT|O_TRUNC, mode=mode_of_f1;
-//      copy f1 to f2
+//    If both files regular files, or just 1 is regular and file 2 doesnt exist.       
+      if((S_ISREG(buf2.st_mode) && S_ISREG(buf1.st_mode)) || (S_ISREG(buf1.st_mode) && f2exist))
+      {
+            fp = open(f1, O_RDONLY);
+            fp2 = open(f2, O_WRONLY | O_CREAT | O_TRUNC, buf1.st_mode);
+            size = buf1.st_size;
+            char *buffer = (char*)malloc(size * sizeof(char));
+            r1 = read(fp, buffer, size);
+            w1 = write(fp2, buffer, size * sizeof(char));
+            free(buffer);
+            close(fp);
+            close(fp2);
+            return 1;
+      }
+      return 0;
 }
 
 int cpf2d(char *f1, char *f2)
