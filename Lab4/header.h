@@ -90,7 +90,7 @@ int cpf2f(char *f1, char *f2)
       }
 //   2. if f1 is LNK and f2 exists: reject
 //    I don't know why this says reject cp -r allows lnk and existing files?
-      if(!f2exist && S_ISLNK(buf1.st_mode))
+      if(S_ISREG(buf2.st_mode) && S_ISLNK(buf1.st_mode))
       {     
             struct stat symbuf;
             stat(realpath(f1, NULL), &symbuf);
@@ -105,8 +105,13 @@ int cpf2f(char *f1, char *f2)
             close(fp2);
             return 1;
       }
-
-//   3. if f1 is LNK and f2 does not exist: create LNK file f2 SAME as f1
+//    if f1 is LNK and f2 does not exist: create LNK file f2 SAME as f1
+      if(S_ISLNK(buf1.st_mode) && f2exist)
+      {
+            printf("INhere\n");
+            //symlink(f1, f2);
+            symlink(basename(realpath(f1, NULL)), f2);
+      }
 //   4:
 //      open f1 for READ;
 //      open f2 for O_WRONLY|O_CREAT|O_TRUNC, mode=mode_of_f1;
