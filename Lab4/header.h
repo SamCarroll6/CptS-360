@@ -107,7 +107,6 @@ int cpf2f(char *f1, char *f2)
 //    if f1 is LNK and f2 does not exist: create LNK file f2 SAME as f1.
       if(S_ISLNK(buf1.st_mode) && f2exist)
       {
-            printf("INhere\n");
             symlink(basename(realpath(f1, NULL)), f2);
             return 1;
       }
@@ -133,8 +132,10 @@ int cpf2d(char *f1, char *f2)
 {
       printf("cpf2d\n");
       DIR *dir = opendir(f2);
-      char *bname = (char*)malloc(sizeof(char) * strlen(basename(f1)));
-      bname = basename(f1);
+      char *bname = (char*)malloc(sizeof(char) * strlen(f1));
+      strcpy(bname, f1);
+      bname = basename(bname);
+      printf("%s\n", bname);
       struct dirent *sd;
       if(dir == NULL)
       {
@@ -193,5 +194,33 @@ int cpf2d(char *f1, char *f2)
 int cpd2d(char *f1, char *f2)
 {
       printf("cpd2d\n");
+      struct stat buf1;
+      struct stat buf2;
+      struct stat buf3;
+      stat(f1, &buf1);
+      stat(f2, &buf2);
+      char *dname = (char*)malloc(sizeof(char) * strlen(f2));
+      char *hold = (char*)malloc(sizeof(char) * strlen(f2));
+      strcpy(dname, f2);
+      strcpy(hold, f2);
+      dirname(dname);
+      while(strcmp(dname, hold))
+      {
+            printf("%s\n", dname);
+            stat(dname, &buf3);
+            if(buf1.st_ino == buf3.st_ino)
+            {
+                  printf("Can't copy into SubDir\n");
+                  free(dname);
+                  free(hold);
+                  return 0;
+            }
+            strcpy(hold, dname);
+            dirname(dname);
+      }
+      free(dname);
+      free(hold);
+      DIR *dir1 = opendir(f1);
+      DIR *dir2 = opendir(f2);
     // recursively cp dir into dir    
 }
