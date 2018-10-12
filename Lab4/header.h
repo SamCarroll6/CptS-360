@@ -38,6 +38,18 @@ int myrcp(char *f1, char *f2)
             {
                   mkdir(f2, buf1.st_mode);
             }
+            else
+            {
+                  char *hold = (char*)malloc(sizeof(char) * (strlen(f2) + strlen(f1)));
+                  strcpy(hold, f2);
+                  char *bname = (char*)malloc(sizeof(char) * (strlen(f1)));
+                  bname = basename(f1);
+                  if(hold[strlen(hold) - 1] != '/')
+                        strcat(hold, "/");
+                  strcat(hold,bname);
+                  mkdir(hold, buf1.st_mode);
+                  return cpd2d(f1, hold);
+            }
 	      return cpd2d(f1, f2);
          }
          printf("%s file type not recognized\n", f1);
@@ -66,7 +78,6 @@ int cpf2f(char *f1, char *f2)
       struct stat buf1;
       struct stat buf2;
       int fp, fp2, size, r1, w1;
-      printf("cpf2f\n");
       lstat(f1, &buf1);
       int f2exist = lstat(f2, &buf2);
 //   1. reject if f1 and f2 are the SAME file
@@ -130,12 +141,10 @@ int cpf2f(char *f1, char *f2)
 
 int cpf2d(char *f1, char *f2)
 {
-      printf("cpf2d\n");
       DIR *dir = opendir(f2);
       char *bname = (char*)malloc(sizeof(char) * strlen(f1));
       strcpy(bname, f1);
       bname = basename(bname);
-      printf("%s\n", bname);
       struct dirent *sd;
       if(dir == NULL)
       {
@@ -179,21 +188,12 @@ int cpf2d(char *f1, char *f2)
       }
       close(dir);
       return cpf2f(f1, f2);
-//   1. search DIR f2 for basename(f1)
-//      (use opendir(), readdir())
-//       x=basename(f1); 
-// if x not in f2/ ==>        cpf2f(f1, f2/x)
-// if x already in f2/: 
-//      if f2/x is a file ==> cpf2f(f1, f2/x)
-//      if f2/x is a DIR  ==> cpf2d(f1, f2/x)
-      
 }
 
 
 
 int cpd2d(char *f1, char *f2)
 {
-      printf("cpd2d\n");
       struct stat buf1;
       struct stat buf2;
       struct stat buf3;
@@ -217,7 +217,6 @@ int cpd2d(char *f1, char *f2)
       dirname(dname);
       while(strcmp(dname, hold))
       {
-            printf("%s\n", dname);
             stat(dname, &buf3);
             if(buf1.st_ino == buf3.st_ino)
             {
@@ -235,7 +234,6 @@ int cpd2d(char *f1, char *f2)
       DIR *dir = opendir(f1);
       while((sd = readdir(dir)) != NULL)
       {
-             printf("while f2 = %s\n", f2);
              if(strcmp(".", sd->d_name) && strcmp("..", sd->d_name))
              {
                   // Has to be copied, if I use f2 it gets modified in function calls.
@@ -246,7 +244,6 @@ int cpd2d(char *f1, char *f2)
                   strcat(hold, sd->d_name);
                   struct stat check;
                   stat(hold, &check);
-                  printf("%o  %s\n", check.st_mode, hold);
                   if(S_ISDIR(check.st_mode))
                   {
                         if(hold[strlen(f2) - 1] != '/')
@@ -256,11 +253,8 @@ int cpd2d(char *f1, char *f2)
                   }
                   else
                   {
-                        printf("Else hold2 = %s\n", hold2);
                         cpf2d(hold, hold2); 
                   }
              }
       }
-
-    // recursively cp dir into dir    
 }
