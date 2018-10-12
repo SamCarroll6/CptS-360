@@ -36,7 +36,7 @@ int myrcp(char *f1, char *f2)
             }
             if (f2exist)
             {
-                  mkdir(f2, 0755);
+                  mkdir(f2, buf1.st_mode);
             }
 	      return cpd2d(f1, f2);
          }
@@ -197,10 +197,21 @@ int cpd2d(char *f1, char *f2)
       struct stat buf1;
       struct stat buf2;
       struct stat buf3;
+      struct dirent *sd;
       stat(f1, &buf1);
-      stat(f2, &buf2);
+      int f2exist = stat(f2, &buf2);
+      if(buf1.st_ino == buf2.st_ino)
+      {
+            printf("cp: %s and %s are the same directory\n", f1, f2);
+            return 0;
+      }
+      if(f2exist)
+      {
+            mkdir(f2, buf1.st_mode);
+      }
       char *dname = (char*)malloc(sizeof(char) * strlen(f2));
       char *hold = (char*)malloc(sizeof(char) * strlen(f2));
+      char *hold2 = (char*)malloc(sizeof(char) * strlen(f2));
       strcpy(dname, f2);
       strcpy(hold, f2);
       dirname(dname);
@@ -220,7 +231,36 @@ int cpd2d(char *f1, char *f2)
       }
       free(dname);
       free(hold);
-      DIR *dir1 = opendir(f1);
-      DIR *dir2 = opendir(f2);
+      hold = (char*)malloc(sizeof(char) * (strlen(f1) + strlen(f2)));
+      DIR *dir = opendir(f1);
+      while((sd = readdir(dir)) != NULL)
+      {
+             printf("while f2 = %s\n", f2);
+             if(strcmp(".", sd->d_name) && strcmp("..", sd->d_name))
+             {
+                  // Has to be copied, if I use f2 it gets modified in function calls.
+                  strcpy(hold2, f2);
+                  strcpy(hold, f1);
+                  if(hold[strlen(f1) - 1] != '/')
+                        strcat(hold, "/");
+                  strcat(hold, sd->d_name);
+                  struct stat check;
+                  stat(hold, &check);
+                  printf("%o  %s\n", check.st_mode, hold);
+                  if(S_ISDIR(check.st_mode))
+                  {
+                        if(hold[strlen(f2) - 1] != '/')
+                              strcat(hold2, "/");
+                        strcat(hold2, sd->d_name);
+                        cpd2d(hold, hold2); 
+                  }
+                  else
+                  {
+                        printf("Else hold2 = %s\n", hold2);
+                        cpf2d(hold, hold2); 
+                  }
+             }
+      }
+
     // recursively cp dir into dir    
 }
