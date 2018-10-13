@@ -40,6 +40,11 @@ int myrcp(char *f1, char *f2)
             }
             else
             {
+                  if(buf1.st_ino == buf2.st_ino)
+                  {
+                        printf("cp: %s and %s are the same directory\n", f1, f2);
+                        return 0;
+                  }
                   char *hold = (char*)malloc(sizeof(char) * (strlen(f2) + strlen(f1)));
                   strcpy(hold, f2);
                   char *bname = (char*)malloc(sizeof(char) * (strlen(f1)));
@@ -47,7 +52,7 @@ int myrcp(char *f1, char *f2)
                   if(hold[strlen(hold) - 1] != '/')
                         strcat(hold, "/");
                   strcat(hold,bname);
-                  mkdir(hold, buf1.st_mode);
+                 // mkdir(hold, buf1.st_mode);
                   return cpd2d(f1, hold);
             }
 	      return cpd2d(f1, f2);
@@ -200,15 +205,6 @@ int cpd2d(char *f1, char *f2)
       struct dirent *sd;
       stat(f1, &buf1);
       int f2exist = stat(f2, &buf2);
-      if(buf1.st_ino == buf2.st_ino)
-      {
-            printf("cp: %s and %s are the same directory\n", f1, f2);
-            return 0;
-      }
-      if(f2exist)
-      {
-            mkdir(f2, buf1.st_mode);
-      }
       char *dname = (char*)malloc(sizeof(char) * strlen(f2));
       char *hold = (char*)malloc(sizeof(char) * strlen(f2));
       char *hold2 = (char*)malloc(sizeof(char) * strlen(f2));
@@ -230,6 +226,10 @@ int cpd2d(char *f1, char *f2)
       }
       free(dname);
       free(hold);
+            if(f2exist)
+      {
+            mkdir(f2, buf1.st_mode);
+      }
       hold = (char*)malloc(sizeof(char) * (strlen(f1) + strlen(f2)));
       DIR *dir = opendir(f1);
       while((sd = readdir(dir)) != NULL)
