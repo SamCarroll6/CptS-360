@@ -21,6 +21,8 @@ DIR   *dp;
 int fd;
 int iblock;
 
+int search(INODE *ip2, char *name);
+
 int get_block(int fd, int blk, char buf[ ])
 {
   lseek(fd,(long)blk*BLKSIZE, 0);
@@ -44,6 +46,9 @@ int dirfun()
   ip = (INODE *)buf + 1;  // ip points at 2nd INODE
   size = ip->i_size;
 
+  int ret = search(ip, "file1");
+  printf("ret=%d\n", ret);
+
   get_block(fd, ip->i_block[0], buf);
   
   dp = (DIR *)buf;
@@ -56,6 +61,30 @@ int dirfun()
         dp = (void *)dp + dp->rec_len;
 	count+=dp->rec_len;	
   }
+}
+
+int search(INODE *ip2, char *name)
+{
+  int size, count = 0;
+  char buf[BLKSIZE];
+  size = ip->i_size;
+
+  get_block(fd, ip->i_block[0], buf);
+
+  dp = (DIR *)buf;
+  char nameval[BLKSIZE + 1];
+  while(count < size && dp->inode)
+  {
+        memcpy(nameval, dp->name, dp->name_len);
+        nameval[dp->name_len] = '\0';
+	if(!strcmp(nameval, name))
+	{
+		return dp->inode;	
+	}
+        dp = (void *)dp + dp->rec_len;
+        count+=dp->rec_len;
+  }
+  return 0;
 }
 
 char *disk = "mydisk";
