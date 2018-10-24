@@ -54,26 +54,6 @@ int get_block(int fd, int blk, char buf[ ])
   read(fd, buf, BLKSIZE);
 }
 
-int groupdesc()
-{
-	get_block(fd, 2, buf);
-	gp = (GD *)buf;
-	/*
-	 *   u32  bg_block_bitmap;          // Bmap block number
-	 *   u32  bg_inode_bitmap;          // Imap block number
-	 *   u32  bg_inode_table;           // Inodes begin block number
-	 *   u16  bg_free_blocks_count;     // THESE are OBVIOUS
-	 *   u16  bg_free_inodes_count;
-	 *   u16  bg_used_dirs_count;   
-	 */
-	printf("Bmap block number = %d\n", gp->bg_block_bitmap);
-	printf("Imap block number = %d\n", gp->bg_inode_bitmap);
-	printf("Inodes begin block number = %d\n", gp->bg_inode_table);
-	printf("Free inodes count = %d\n", gp->bg_free_inodes_count);
-	printf("Free blocks count = %d\n", gp->bg_free_blocks_count);
-	printf("Used dirs count = %d\n", gp->bg_used_dirs_count);
-}
-
 int super()
 {
   // read SUPER block
@@ -105,12 +85,9 @@ int super()
   printf("s_max_mnt_count = %d\n", sp->s_max_mnt_count);
 
   printf("s_magic = %x\n", sp->s_magic);
-  //printf("s_mtime = %d\n", sp->s_mtime);
   time_t val = sp->s_mtime, val2 = sp->s_wtime;
   printf("s_mtime = %s", ctime(&val));
   printf("s_wtime = %s", ctime(&val2));
-  //printf("s_mtime = %s\n", ctime(&((time_t)sp->s_mtime/1000000)));
-  //printf("s_wtime = %s\n", ctime(&sp->s_wtime));
 }
 
 char *disk = "mydisk";
@@ -125,6 +102,5 @@ int main(int argc, char *argv[ ])
     exit(1);
   }
   super();
-  groupdesc();
   close(fd);
 }
