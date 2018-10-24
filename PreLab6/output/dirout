@@ -1,0 +1,13 @@
+inode_block=10
+ret=16
+         2	.
+         2	..
+        11	lost+found
+        12	dir1
+        13	dir2
+        14	dir3
+        15	dir4
+        16	file1
+        17	file2
+        18	file3
+        19	file4

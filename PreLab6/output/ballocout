@@ -1,0 +1,7 @@
+ninodes=184 nblocks=1440 nfreeInodes=135 nfreeBlocks=1359
+bmap = 8
+allocated bno = 79
+allocated bno = 80
+allocated bno = 81
+allocated bno = 82
+allocated bno = 83
