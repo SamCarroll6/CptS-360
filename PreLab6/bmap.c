@@ -58,6 +58,8 @@ int bmap()
 		(tst_bit(buf,i)) ? putchar('1') : putchar('0');
 		 if (i && ((i+1) % 8)==0)
        			printf(" ");
+		 if((i+1) % 80 == 0)
+			 printf("\n");
 	}
   	printf("\n");
 
