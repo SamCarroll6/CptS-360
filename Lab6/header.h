@@ -8,14 +8,14 @@
 typedef struct ext2_group_desc  GD;
 typedef struct ext2_super_block SUPER;
 typedef struct ext2_inode       INODE;
-typedef struct ext2_dir_entry_2 DIR; 
+typedef struct ext2_dir_entry_2 DIR;
 
 #define BLKSIZE 1024
 
 GD    *gp;
 SUPER *sp;
 INODE *ip;
-DIR *dp; 
+DIR *dp;
 
 int fd;
 int iblock;
@@ -75,7 +75,7 @@ int search(INODE *ip, char *name)
     printf("%d\t  %d\t\t%d\t%s\n", dp->inode, dp->rec_len, dp->name_len, dp->name);
 	if(!strcmp(nameval, name))
 	{
-		return dp->inode;	
+		return dp->inode;
 	}
         dp = (void *)dp + dp->rec_len;
         count+=dp->rec_len;
@@ -83,15 +83,21 @@ int search(INODE *ip, char *name)
   return -1;
 }
 
-void printindirects(int size, char buf[])
+void printindirects(int size, int buf[])
 {
     int i = 0;
+    int count = 0;
     for(i; i < size; i++)
     {
-        printf("[%d]%d  ", i, buf[i]);
-        if((i + 1)%12 == 0)
+        if(buf[i] != 0)
+        {
+            printf("%d  ", buf[i]);
+            count++;
+        }
+        if((count + 1)%10 == 0)
         {
             putchar('\n');
+            count++;
         }
     }
 }
@@ -110,13 +116,13 @@ int getInode(void)
   // read GD
   get_block(fd, 2, buf);
   gp = (GD *)buf;
-  
+
   iblock = gp->bg_inode_table;   // get inode start block#
   printf("inode_block=%d\n", iblock);
 
-  // get inode start block     
+  // get inode start block
   get_block(fd, iblock, buf);
-  
+
   ip = (INODE *)buf + 1;  // ip points at 2nd INODE
   size = ip->i_size;
   int i = 0;
@@ -131,7 +137,7 @@ int getInode(void)
         printf("can't find %s from pathname\n", path[i]);
         exit(1);
     }
-    blk = (ret - 1) / 8 + iblock;  // disk block contain this INODE 
+    blk = (ret - 1) / 8 + iblock;  // disk block contain this INODE
     offset = (ret - 1) % 8;         // offset of INODE in this block
     get_block(fd, blk, buf);
     ip = (INODE *)buf + offset;    // ip -> new INODE
@@ -147,22 +153,26 @@ int getInode(void)
       printf("can't find %s from pathname\n", Bname);
       exit(1);
     }
-    blk = (ret - 1) / 8 + iblock;  // disk block contain this INODE 
+    blk = (ret - 1) / 8 + iblock;  // disk block contain this INODE
     offset = (ret - 1) % 8;         // offset of INODE in this block
     get_block(fd, blk, buf);
     ip = (INODE *)buf + offset;    // ip -> new INODE
     i = 0;
   }
   printf("***************** First 12 blocks ******************\n");
-  for(i;i < 12;i++)
+  for(i = 0;i < 14;i++)
   {
-      printf("[%d]%d  ", i, ip->i_block[i]);
+      if(ip->i_block[i] != 0)
+      {
+        printf("block[%d] = %d\n", i, ip->i_block[i]);
+      }
   }
   printf("\n");
 
   printf("***************** Indirect Blocks ******************\n");
   get_block(fd, ip->i_block[12], buf);
-  printindirects(256, buf);
+  int *thing = (int*)buf;
+  printindirects(256, thing);
   putchar('\n');
   printf("************** Double Indirect Blocks **************\n");
   get_block(fd, ip->i_block[13], buf);
@@ -174,7 +184,8 @@ int getInode(void)
           break;
       }
       get_block(fd, buf[i], hold);
-      printindirects(256, hold);
+      printindirects(256, hold2);
+      putchar('\n');
   }
 
 }
