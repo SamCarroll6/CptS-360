@@ -15,5 +15,6 @@ int main(int argc, char *argv[])
         exit(1);
     }
     char *pathname = argv[2];
-    splitpath(pathname);
+    splitpath(pathname, fd);
+    getInode();
 }

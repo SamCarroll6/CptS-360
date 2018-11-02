@@ -10,5 +10,5 @@
         mkfs -b 1024 $1 1440
         sudo mount -o loop $1 /mnt
    fi
-   (cd /mnt; sudo mkdir dir1 dir2 dir3 dir4; sudo touch file1 file2 file3 file4; ls -l;)
+   (cd /mnt; sudo mkdir dir1 dir2 dir3 dir4 dir1/dir2; sudo touch file1 file2 file3 file4; ls -l;)
    sudo umount /mnt
