@@ -177,19 +177,4 @@ int getInode(void)
       printindirects(256, hold);
   }
 
-
-//   get_block(fd, ip->i_block[0], buf);
-  
-//   dp = (DIR *)buf;
-
-//   char nameval[BLKSIZE + 1];
-  
-//   while(count < size && dp->inode)
-//   {
-//   	strncpy(nameval, dp->name, dp->name_len);
-// 	nameval[dp->name_len] = '\0';
-//   	printf("%10u\t%s\n", dp->inode, nameval);
-//     dp = (void *)dp + dp->rec_len;
-// 	count+=dp->rec_len;	
-//   }
 }
