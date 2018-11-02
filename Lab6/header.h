@@ -23,6 +23,7 @@ int iblock;
 char *Bname;
 char *path[25];
 
+
 int splitpath(char *pathname, int dev)
 {
     char *hold = (char*)malloc(sizeof(char) * strlen(pathname));
@@ -102,6 +103,8 @@ void printindirects(int size, int buf[])
     }
 }
 
+int printindirectblocks(int bid, char buf[]);
+
 int getInode(void)
 {
   char buf[BLKSIZE];
@@ -160,7 +163,7 @@ int getInode(void)
     i = 0;
   }
   printf("***************** First 12 blocks ******************\n");
-  for(i = 0;i < 14;i++)
+  for(i = 0;i < 12;i++)
   {
       if(ip->i_block[i] != 0)
       {
@@ -170,22 +173,30 @@ int getInode(void)
   printf("\n");
 
   printf("***************** Indirect Blocks ******************\n");
-  get_block(fd, ip->i_block[12], buf);
-  int *thing = (int*)buf;
+  int thing[BLKSIZE];
+  int Dthing[BLKSIZE];
+  get_block(fd, ip->i_block[12], thing);
   printindirects(256, thing);
   putchar('\n');
   printf("************** Double Indirect Blocks **************\n");
-  get_block(fd, ip->i_block[13], buf);
-  char hold[BLKSIZE];
-  for(i = 0; i < 256; i++)
+  get_block(fd, ip->i_block[13], thing);
+  for(i = 0; i<256 ; i++)
   {
-      if(buf[i] == 0)
+      if(thing[i] == 0)
       {
           break;
       }
-      get_block(fd, buf[i], hold);
-      printindirects(256, hold2);
-      putchar('\n');
+      get_block(fd, thing[i], Dthing);
+      printindirects(256,Dthing);
   }
+  putchar('\n');
 
 }
+
+// int printindirectblocks(int bid, char buf[])
+// {
+//     get_block(fd, bid, buf);
+//     int* val = (int*)buf;
+//     printindirects(256, val);
+//     putchar('\n');
+// }
