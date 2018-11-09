@@ -63,7 +63,7 @@ MINODE *root;
 PROC   proc[NPROC], *running;
 
 char gpath[256];
-char *name[64]; // assume at most 64 components in pathnames
+char name[64][64]; // assume at most 64 components in pathnames
 int  n;
 
 int  fd, dev;
@@ -71,8 +71,14 @@ int  nblocks, ninodes, bmap, imap, inode_start;
 char line[256], cmd[32], pathname[256];
 
 int get_block(int fd, int blk, char buf[]);
-int init();
+int init(void);
 int mountroot(char *diskname);
+MINODE *iget(int dev, int ino);
+INODE *get_inode(int dev, int ino);
+char* Parse(char* input);
+char* readinput(void);
+//void splitpath(char *pathname);
+int tokenize(char *pathname);
 
 
 #endif
