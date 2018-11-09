@@ -127,6 +127,8 @@ char* Parse(char* input)
 
 int tokenize(char *pathname)
 {
+    if(pathname == NULL)
+        return 0;
     char *token;
     int i = 0;
     if(pathname[0] == '/')

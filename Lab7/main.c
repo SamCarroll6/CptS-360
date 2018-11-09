@@ -21,16 +21,22 @@ int main(int argc, char *argv[])
         hold = Parse(input);
         ret = tokenize(hold);
         int i = 0;
+        printf("%s\n", input);
+        if(input != 0)
+        {
         // while(name[i])
         // {
         //     printf("%s\n", name[i]);
         //     i++;
         // }
+        }
         i = 0;
         while(name[i])
         {
             name[i] = NULL;
             i++;
         }
+        input = NULL;
+        hold = NULL;
     }
 }
