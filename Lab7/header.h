@@ -63,7 +63,7 @@ MINODE *root;
 PROC   proc[NPROC], *running;
 
 char gpath[256];
-char name[64][64]; // assume at most 64 components in pathnames
+char *name[64]; // assume at most 64 components in pathnames
 int  n;
 
 int  fd, dev;

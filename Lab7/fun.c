@@ -127,18 +127,24 @@ char* Parse(char* input)
 
 int tokenize(char *pathname)
 {
-    char *Bname;
+    char *token;
     int i = 0;
-    while(pathname)
+    if(pathname[0] == '/')
     {
-        Bname = basename(pathname);
-        name[i] = Bname;
-        dirname(pathname);
-        printf("BNAME = %s\n", Bname);
-        if(!strcmp(Bname,pathname))
-        {
-            break;
-        }
+        name[i] = "/";
         i++;
     }
+    token = strtok(pathname, "/");
+    name[i] = token;
+    i++;
+    while(token)
+    {
+        token = strtok(NULL, "/");
+        if(token)
+        {
+            name[i] = token;
+            i++;
+        }
+    }
+    return i;
 }
