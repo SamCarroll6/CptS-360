@@ -24,6 +24,26 @@ int main(int argc, char *argv[])
         printf("%s\n", input);
         if(input != 0)
         {
+            if(!strcmp(input, "ls"))
+            {
+
+            }
+            else if(!strcmp(input, "cd"))
+            {
+
+            }
+            else if(!strcmp(input, "pwd"))
+            {
+
+            }
+            else if(!strcmp(input, "quit"))
+            {
+
+            }
+            else
+            {
+                printf("Error: Invalid command %s\n", input);
+            }
         // while(name[i])
         // {
         //     printf("%s\n", name[i]);

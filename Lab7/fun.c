@@ -30,7 +30,7 @@ int mountroot(char *diskname)
     running = &proc[0];
 }
 
-init(void)
+int init(void)
 {
     printf("Checking EXT2 FS... init()\n");
     int i = 0;
@@ -149,4 +149,36 @@ int tokenize(char *pathname)
         }
     }
     return i;
+}
+
+// void ls(void)
+// {
+
+// }
+
+void ls_file(int ino)
+{
+    
+}
+
+void pwd(MINODE *pr)
+{
+    if(pr == root)
+    {
+        printf("/");
+    }
+    else
+    {
+        rpwd(pr);
+    }
+}
+
+void rpwd(MINODE *pr)
+{
+    MINODE *pip;
+    if(pr == root)
+    {
+        return;
+    }
+
 }
