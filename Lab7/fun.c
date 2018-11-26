@@ -89,11 +89,11 @@ INODE *get_inode(int dev, int ino)
 {
     char buf[BLKSIZE];
     int blk, offset;
-    get_block(fd, inode_start, buf);
+    get_block(dev, inode_start, buf);
     ip = (INODE*)buf + 1;
     blk = (ino - 1) / 8 + inode_start;
     offset = (ino - 1) % 8;
-    get_block(fd, blk, buf);
+    get_block(dev, blk, buf);
     ip = (INODE*)buf + offset;
     return ip;
 }
@@ -151,34 +151,30 @@ int tokenize(char *pathname)
     return i;
 }
 
-// void ls(void)
-// {
-
-// }
-
-void ls_file(int ino)
+int search(INODE *ip, char *name)
 {
-    
-}
+  printf("Search for %s\n", name);
+  printf("i_block[0] = %d\n", ip->i_block[0]);
+  int size, count = 0;
+  char buf[BLKSIZE];
+  size = ip->i_size;
+  printf("%d\n", size);
+  get_block(fd, ip->i_block[0], buf);
 
-void pwd(MINODE *pr)
-{
-    if(pr == root)
-    {
-        printf("/");
-    }
-    else
-    {
-        rpwd(pr);
-    }
-}
-
-void rpwd(MINODE *pr)
-{
-    MINODE *pip;
-    if(pr == root)
-    {
-        return;
-    }
-
+  dp = (DIR *)buf;
+  char nameval[BLKSIZE + 1];
+  printf("i_number  rec_len    name_len   name\n");
+  while(count < size && dp->inode)
+  {
+    memcpy(nameval, dp->name, dp->name_len);
+    nameval[dp->name_len] = '\0';
+    printf("%d\t  %d\t\t%d\t%s\n", dp->inode, dp->rec_len, dp->name_len, dp->name);
+	if(!strcmp(nameval, name))
+	{
+		return dp->inode;
+	}
+        dp = (void *)dp + dp->rec_len;
+        count+=dp->rec_len;
+  }
+  return -1;
 }

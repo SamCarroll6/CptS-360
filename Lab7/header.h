@@ -70,6 +70,7 @@ int  fd, dev;
 int  nblocks, ninodes, bmap, imap, inode_start;
 char line[256], cmd[32], pathname[256];
 
+// Utility/Mount Functions 
 int get_block(int fd, int blk, char buf[]);
 int init(void);
 int mountroot(char *diskname);
@@ -77,8 +78,15 @@ MINODE *iget(int dev, int ino);
 INODE *get_inode(int dev, int ino);
 char* Parse(char* input);
 char* readinput(void);
-//void splitpath(char *pathname);
 int tokenize(char *pathname);
+int search(INODE *ip, char *name);
+
+// PWD, CD, LS functions
+void ls_dir(MINODE *mip);
+void ls_file(MINODE* mip, char *name2)
+MINODE* findval(MINODE *mip);
+void pwd(MINODE *pr);
+void rpwd(MINODE *pr);
 
 
 #endif

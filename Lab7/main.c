@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
     init();
     mountroot(diskname);
     int ret;
+    MINODE* pathfollow;
     while(1)
     {
         input = readinput();
@@ -26,7 +27,20 @@ int main(int argc, char *argv[])
         {
             if(!strcmp(input, "ls"))
             {
-
+                if(name[0] == NULL)
+                {
+                    ls_dir(running->cwd);
+                }
+                else
+                {
+                    if(strcmp(name[0], "/"))
+                        pathfollow = findval(root);
+                    else
+                    {
+                        pathfollow = findval(running->cwd);
+                    }
+                    ls_dir(pathfollow);
+                }
             }
             else if(!strcmp(input, "cd"))
             {
@@ -34,7 +48,7 @@ int main(int argc, char *argv[])
             }
             else if(!strcmp(input, "pwd"))
             {
-
+                pwd(root);
             }
             else if(!strcmp(input, "quit"))
             {
