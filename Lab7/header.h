@@ -96,5 +96,6 @@ int findmyname(MINODE *parent, u32 myino, char **myname);
 int findino(MINODE *mip, u32 myino);
 void pwd(MINODE *pr);
 void rpwd(MINODE *pr);
+int quit(void);
 
 #endif

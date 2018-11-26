@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
             }
             else if(!strcmp(input, "quit"))
             {
-
+                quit();
             }
             else
             {

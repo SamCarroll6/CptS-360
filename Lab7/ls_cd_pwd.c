@@ -26,25 +26,26 @@ int checktype(MINODE *mip)
 */
 void ls_dir(MINODE *mip)
 {
-    ip = &mip->INODE;
+    INODE *pip = &mip->INODE;
     int i = 0;
     int size, count = 0;
-    char buf[BLKSIZE];
-    size = ip->i_size;
+    int buf[BLKSIZE];
+    size = pip->i_size;
     for(i; i < 12; i++)
     {
-        if(ip->i_block[i] == 0)
+        if(pip->i_block[i] == 0)
         {
             break;
         }
-        get_block(fd, ip->i_block[i], buf);
+        printf("i_block[%d] = %d\n", i, pip->i_block[i]);
+        get_block(mip->dev, pip->i_block[i], buf);
         dp = (DIR *)buf;
         char nameval[BLKSIZE + 1];
         while(count < size && dp->inode)
         {
             memcpy(nameval, dp->name, dp->name_len);
             nameval[dp->name_len] = '\0';
-            MINODE* next = iget(fd, dp->inode);
+            MINODE* next = iget(mip->dev, dp->inode);
             ls_file(next, nameval);
             count+=dp->rec_len;
             dp = (void *)dp + dp->rec_len;
@@ -216,4 +217,17 @@ void rpwd(MINODE *pr)
     findmyname(pip, pr->ino, &name2);
     rpwd(pip);
     printf("/%s", name2);
+}
+
+int quit(void)
+{
+    int i;
+    MINODE *mip;
+    for(i = 0; i < NMINODE; i++)
+    {
+        mip = &minode[i];
+        if(mip->refCount > 0 && mip->dirty)
+            iput(mip);
+    }
+    exit(0);
 }

@@ -98,9 +98,7 @@ int iput(MINODE *mip)
     if(mip == NULL)
         return;
     mip->refCount--;
-    if(mip->refCount > 0)
-        return;
-    if(!mip->dirty)
+    if(mip->refCount > 0 && !mip->dirty)
         return;
     int ino = getino(mip, ".");
     // 8 is the number of inodes per block
