@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
                     {
                         pathfollow = findval(running->cwd);
                     }
+                    printf("pathfollow = %d\n", pathfollow->ino);
                     ls_dir(pathfollow);
                 }
             }
