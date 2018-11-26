@@ -1,5 +1,19 @@
 #include "header.h"
 
+int checktype(MINODE *mip)
+{
+    INODE* pip = &mip->INODE;
+    u16 mode = pip->i_mode;
+    u16 type = mode & 0xF000;
+    switch(type)
+    {
+        case 0x4000:
+            return 1;
+        default:
+            return 0;
+    }
+}
+
 void ls_dir(MINODE *mip)
 {
     ip = &mip->INODE;
@@ -32,10 +46,26 @@ void ls_file(MINODE* mip, char *name2)
 {
     INODE* pip = &mip->INODE;
     u16 mode = pip->i_mode;
-    time_t val = pip->i_mtime;
+    time_t val = pip->i_ctime;
     char *mtime = ctime(&val);
     mtime[strlen(mtime) - 1] = '\0';
     //printf("0x%x\n", (mode & 0xF000));
+    u16 type = mode & 0xF000;
+    switch(type)
+    {
+        case 0x4000:
+            printf("d");
+            break;
+        case 0x8000:
+            printf("-");
+            break;
+        case 0xA000:
+            printf("l");
+            break;
+        default:
+            printf("-");
+            break;
+    }
     printf( (mode & S_IRUSR) ? "r" : "-");
     printf( (mode & S_IWUSR) ? "w" : "-");
     printf( (mode & S_IXUSR) ? "x" : "-");
@@ -58,10 +88,14 @@ MINODE* findval(MINODE *mip)
     {
         i = 0;
     }
-    printf("i = %d\n", i);
     while(name[i])
     {
         ino = search(check, name[i]);
+        if(ino == -1)
+        {
+            printf("Name %s does not exist\n", name[i]);
+            return NULL;
+        }
         mip = iget(fd, ino);
         check = &mip->INODE;
         i++;

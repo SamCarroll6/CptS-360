@@ -118,6 +118,7 @@ char* Parse(char* input)
     int i = 0;
     char *token, *hold;
     token = strtok(input, " ");
+    printf("input = %s\n", input);
     if(token = strtok(NULL, " "))
     {
         return token;
@@ -127,6 +128,7 @@ char* Parse(char* input)
 
 int tokenize(char *pathname)
 {
+    printf("path = %s\n", pathname);
     if(pathname == NULL)
         return 0;
     char *token;
@@ -163,7 +165,6 @@ int search(INODE *ip, char *name)
 
   dp = (DIR *)buf;
   char nameval[BLKSIZE + 1];
-  printf("i_number  rec_len    name_len   name\n");
   while(count < size && dp->inode)
   {
     memcpy(nameval, dp->name, dp->name_len);
@@ -171,10 +172,12 @@ int search(INODE *ip, char *name)
     printf("%d\t  %d\t\t%d\t%s\n", dp->inode, dp->rec_len, dp->name_len, dp->name);
 	if(!strcmp(nameval, name))
 	{
+        printf("===========================================\n");
 		return dp->inode;
 	}
         dp = (void *)dp + dp->rec_len;
         count+=dp->rec_len;
   }
+  printf("===========================================\n");
   return -1;
 }

@@ -86,8 +86,8 @@ int search(INODE *ip, char *name);
 void ls_dir(MINODE *mip);
 void ls_file(MINODE* mip, char *name2);
 MINODE* findval(MINODE *mip);
+int checktype(MINODE *mip);
 void pwd(MINODE *pr);
 void rpwd(MINODE *pr);
-
 
 #endif
