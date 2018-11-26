@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
             }
             else if(!strcmp(input, "pwd"))
             {
-                pwd(root);
+                pwd(running->cwd);
             }
             else if(!strcmp(input, "quit"))
             {

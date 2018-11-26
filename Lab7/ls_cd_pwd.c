@@ -6,6 +6,8 @@
 */
 int checktype(MINODE *mip)
 {
+    if(!mip)
+        return 0;
     INODE* pip = &mip->INODE;
     u16 mode = pip->i_mode;
     u16 type = mode & 0xF000;
@@ -133,7 +135,7 @@ int chdir(void)
     }
     else
     {
-        if(strcmp(name[0], "/"))
+        if(!strcmp(name[0], "/"))
         {
             pathfollow = findval(root);
         }
@@ -158,6 +160,35 @@ int chdir(void)
     }
 }
 
+int findmyname(MINODE *parent, u32 myino, char **myname)
+{
+  INODE *pip = &parent->INODE;
+  int size, count = 0;
+  char buf[BLKSIZE];
+  size = pip->i_size;
+  get_block(fd, pip->i_block[0], buf);
+
+  dp = (DIR *)buf;
+  while(count < size && dp->inode)
+  {
+	if(dp->inode == myino)
+	{
+        *myname = (char*)malloc(sizeof(char) * (dp->name_len + 1));
+        strncpy(*myname, dp->name, dp->name_len);
+        (*myname)[dp->name_len] = '\0';
+		return 0;
+	}
+        dp = (void *)dp + dp->rec_len;
+        count+=dp->rec_len;
+  }
+  return 1;
+}
+
+int findino(MINODE *mip, u32 myino)
+{
+    return getino(mip, "..");
+}
+
 void pwd(MINODE *pr)
 {
     if(pr == root)
@@ -167,15 +198,22 @@ void pwd(MINODE *pr)
     else
     {
         rpwd(pr);
+        putchar('\n');
     }
 }
 
 void rpwd(MINODE *pr)
 {
     MINODE *pip;
+    char *name2;
     if(pr == root)
     {
+        //printf("/");
         return;
     }
-
+    int pino = findino(pr, pr->ino);
+    pip = iget(pr->dev, pino);
+    findmyname(pip, pr->ino, &name2);
+    rpwd(pip);
+    printf("/%s", name2);
 }

@@ -84,6 +84,7 @@ char* Parse(char* input);
 char* readinput(void);
 int tokenize(char *pathname);
 int search(INODE *ip, char *name);
+int search2(INODE *ip, char *name);
 
 // PWD, CD, LS functions
 void ls_dir(MINODE *mip);
@@ -91,6 +92,8 @@ void ls_file(MINODE* mip, char *name2);
 MINODE* findval(MINODE *mip);
 int checktype(MINODE *mip);
 int chdir(void);
+int findmyname(MINODE *parent, u32 myino, char **myname);
+int findino(MINODE *mip, u32 myino);
 void pwd(MINODE *pr);
 void rpwd(MINODE *pr);
 

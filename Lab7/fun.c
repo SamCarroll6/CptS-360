@@ -110,13 +110,14 @@ int iput(MINODE *mip)
     pip = (INODE*)buf + offset;
     *pip = mip->INODE;
     put_block(mip->dev, blk, buf);
+    mip->dirty = 0;
 }
 
 int getino(MINODE *mip, char *name2)
 {
     int i, ino;
     INODE *check = &mip->INODE;
-    ino = search(check, name2);
+    ino = search2(check, name2);
     if(ino == -1)
     {
         printf("Name %s not found\n", name2);
@@ -219,5 +220,28 @@ int search(INODE *ip, char *name)
         count+=dp->rec_len;
   }
   printf("===========================================\n");
+  return -1;
+}
+
+int search2(INODE *ip, char *name)
+{
+  int size, count = 0;
+  char buf[BLKSIZE];
+  size = ip->i_size;
+  get_block(fd, ip->i_block[0], buf);
+
+  dp = (DIR *)buf;
+  char nameval[BLKSIZE + 1];
+  while(count < size && dp->inode)
+  {
+    memcpy(nameval, dp->name, dp->name_len);
+    nameval[dp->name_len] = '\0';
+	if(!strcmp(nameval, name))
+	{
+		return dp->inode;
+	}
+        dp = (void *)dp + dp->rec_len;
+        count+=dp->rec_len;
+  }
   return -1;
 }
