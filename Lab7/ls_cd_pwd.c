@@ -30,8 +30,22 @@ void ls_dir(MINODE *mip)
 
 void ls_file(MINODE* mip, char *name2)
 {
-    INODE* place = &mip->INODE;
-    printf("Mode = %x\n", place->i_mode);
+    INODE* pip = &mip->INODE;
+    u16 mode = pip->i_mode;
+    time_t val = pip->i_mtime;
+    char *mtime = ctime(&val);
+    mtime[strlen(mtime) - 1] = '\0';
+    //printf("0x%x\n", (mode & 0xF000));
+    printf( (mode & S_IRUSR) ? "r" : "-");
+    printf( (mode & S_IWUSR) ? "w" : "-");
+    printf( (mode & S_IXUSR) ? "x" : "-");
+    printf( (mode & S_IRGRP) ? "r" : "-");
+    printf( (mode & S_IWGRP) ? "w" : "-");
+    printf( (mode & S_IXGRP) ? "x" : "-");
+    printf( (mode & S_IROTH) ? "r" : "-");
+    printf( (mode & S_IWOTH) ? "w" : "-");
+    printf( (mode & S_IXOTH) ? "x" : "-");
+    printf("%4d%4d%4d  %s%8d    %s\n", pip->i_links_count, pip->i_gid, pip->i_uid, mtime, pip->i_size, name2);
 }
 
 MINODE* findval(MINODE *mip)
