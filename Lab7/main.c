@@ -32,10 +32,12 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    if(strcmp(name[0], "/"))
-                        pathfollow = findval(root);
+                    if(!strcmp(name[0], "/"))
+                        {printf("%sInhere\n", name[0]);
+                        pathfollow = findval(root);}
                     else
                     {
+                        printf("NOHERE\n");
                         pathfollow = findval(running->cwd);
                     }
                     if(pathfollow != NULL)
