@@ -1,5 +1,9 @@
 #include "header.h"
 
+/*
+    Helper function, just returns if a file 
+    type is directory or standard file.
+*/
 int checktype(MINODE *mip)
 {
     INODE* pip = &mip->INODE;
@@ -14,6 +18,10 @@ int checktype(MINODE *mip)
     }
 }
 
+/*
+    Traverses through our directory mip, each file contained within
+    mip is passed to ls_file to print it's contents.
+*/
 void ls_dir(MINODE *mip)
 {
     ip = &mip->INODE;
@@ -42,6 +50,12 @@ void ls_dir(MINODE *mip)
     }
 }
 
+/*
+    Prints like ls -l in standard linux. This
+    function handles printing the information for
+    an individual file or directory that is passed 
+    in via MINODE* mip.
+*/
 void ls_file(MINODE* mip, char *name2)
 {
     INODE* pip = &mip->INODE;
@@ -78,6 +92,12 @@ void ls_file(MINODE* mip, char *name2)
     printf("%4d%4d%4d  %s%8d    %s\n", pip->i_links_count, pip->i_gid, pip->i_uid, mtime, pip->i_size, name2);
 }
 
+/*
+    Follow tokenized pathname using search function.
+    If path exists you'll have the ino of the directory
+    returned to you, turn this to MINODE and return.
+    If directory doesn't exist return NULL. 
+*/
 MINODE* findval(MINODE *mip)
 {
     int i, ino;
