@@ -6,6 +6,12 @@ int get_block(int fd, int blk, char buf[])
     read(fd, buf, BLKSIZE);
 }
 
+int put_block(int fd, int blk, char buf[])
+{
+    lseek(fd, (long)blk*BLKSIZE, 0);
+    write(fd, buf, BLKSIZE);
+}
+
 int mountroot(char *diskname)
 {
     printf("mountroot()\n");
@@ -83,6 +89,40 @@ MINODE *iget(int dev, int ino)
     }
     printf("Error: No MINODES\n");
     return 0;
+}
+
+int iput(MINODE *mip)
+{
+    char buf[BLKSIZE];
+    INODE *pip;
+    if(mip == NULL)
+        return;
+    mip->refCount--;
+    if(mip->refCount > 0)
+        return;
+    if(!mip->dirty)
+        return;
+    int ino = getino(mip, ".");
+    // 8 is the number of inodes per block
+    int blk = (ino - 1) / 8 + inode_start;
+    int offset = (ino - 1) % 8;
+    get_block(dev, blk, buf);
+    pip = (INODE*)buf + offset;
+    *pip = mip->INODE;
+    put_block(mip->dev, blk, buf);
+}
+
+int getino(MINODE *mip, char *name2)
+{
+    int i, ino;
+    INODE *check = &mip->INODE;
+    ino = search(check, name2);
+    if(ino == -1)
+    {
+        printf("Name %s not found\n", name2);
+        return -1;
+    }
+    return ino;
 }
 
 INODE *get_inode(int dev, int ino)

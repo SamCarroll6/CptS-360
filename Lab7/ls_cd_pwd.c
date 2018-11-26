@@ -123,6 +123,41 @@ MINODE* findval(MINODE *mip)
     return mip;
 }
 
+int chdir(void)
+{
+    MINODE *pathfollow;
+    if(name[0] == NULL)
+    {
+        iput(running->cwd);
+        running->cwd = root;
+    }
+    else
+    {
+        if(strcmp(name[0], "/"))
+        {
+            pathfollow = findval(root);
+        }
+        else
+        {
+            pathfollow = findval(running->cwd);
+        }
+        if(checktype(pathfollow))
+        {
+            iput(running->cwd);
+            running->cwd = pathfollow;
+        }
+        else
+        {
+            int i = 0;
+            while(name[i])
+            {
+                i++;
+            }
+            printf("Error: %s is not a directory\n", name[i - 1]);
+        }
+    }
+}
+
 void pwd(MINODE *pr)
 {
     if(pr == root)

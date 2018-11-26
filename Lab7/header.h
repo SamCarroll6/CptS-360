@@ -73,9 +73,12 @@ char line[256], cmd[32], pathname[256];
 
 // Utility/Mount Functions 
 int get_block(int fd, int blk, char buf[]);
+int put_block(int fd, int blk, char buf[]);
 int init(void);
 int mountroot(char *diskname);
 MINODE *iget(int dev, int ino);
+int iput(MINODE *mip);
+int getino(MINODE *mip, char *name2);
 INODE *get_inode(int dev, int ino);
 char* Parse(char* input);
 char* readinput(void);
@@ -87,6 +90,7 @@ void ls_dir(MINODE *mip);
 void ls_file(MINODE* mip, char *name2);
 MINODE* findval(MINODE *mip);
 int checktype(MINODE *mip);
+int chdir(void);
 void pwd(MINODE *pr);
 void rpwd(MINODE *pr);
 

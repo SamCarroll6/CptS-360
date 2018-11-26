@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
             }
             else if(!strcmp(input, "cd"))
             {
-
+                chdir();
             }
             else if(!strcmp(input, "pwd"))
             {
