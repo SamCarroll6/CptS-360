@@ -40,6 +40,10 @@ int main(int argc, char *argv[])
             {
                 quit();
             }
+            else if(!strcmp(input, "mkdir"))
+            {
+                mdir();
+            }
             else
             {
                 printf("Error: Invalid command %s\n", input);

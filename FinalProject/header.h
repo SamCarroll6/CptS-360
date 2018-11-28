@@ -99,4 +99,16 @@ void pwd(MINODE *pr);
 void rpwd(MINODE *pr);
 int quit(void);
 
+// Allocating functions and helpers
+int tst_bit(char *buf, int bit);
+int set_bit(char *buf, int bit);
+int clr_bit(char *buf, int bit);
+int decFreeInodes(int dev);
+int ialloc(int dev);
+int balloc(int dev);
+
+// MKDIR
+int mdir(void);
+int smkdir(MINODE *mip, char *bname);
+
 #endif

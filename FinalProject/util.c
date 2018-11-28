@@ -143,7 +143,7 @@ char* readinput(void)
     int i = 1, reset = 0;
     char line[1024];
     char *linecpy;
-    printf("input command : [ls|cd|pwd|quit] ");
+    printf("input command : ");
     fgets(line, sizeof(line), stdin);
     reset = strlen(line);
     linecpy = (char*)malloc(sizeof(char) * reset);
@@ -253,6 +253,8 @@ MINODE* findval(MINODE *mip)
 {
     int i, ino;
     INODE *check = &mip->INODE;
+    if(name[0] == NULL)
+        return mip;
     if(!strcmp(name[0],"/"))
         i = 1;
     else
