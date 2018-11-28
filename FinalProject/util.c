@@ -212,19 +212,21 @@ int checktype(MINODE *mip)
     }
 }
 
-int search(INODE *ip, char *name)
+int search(INODE *pip, char *name)
 {
   printf("Search for %s\n", name);
-  printf("i_block[0] = %d\n", ip->i_block[0]);
-  int size, count = 0;
+  printf("i_block[0] = %d\n", pip->i_block[0]);
+  int size;
   char buf[BLKSIZE];
-  size = ip->i_size;
+  char *cp;
+  size = pip->i_size;
   printf("%d\n", size);
-  get_block(fd, ip->i_block[0], buf);
+  get_block(fd, pip->i_block[0], buf);
 
   dp = (DIR *)buf;
+  cp = buf;
   char nameval[BLKSIZE + 1];
-  while(count < size && dp->inode)
+  while(cp < &buf[BLKSIZE])
   {
     memcpy(nameval, dp->name, dp->name_len);
     nameval[dp->name_len] = '\0';
@@ -234,8 +236,8 @@ int search(INODE *ip, char *name)
         printf("===========================================\n");
 		return dp->inode;
 	}
-        dp = (void *)dp + dp->rec_len;
-        count+=dp->rec_len;
+        cp += dp->rec_len;
+        dp = (DIR*)cp;
   }
   printf("===========================================\n");
   return -1;
@@ -272,16 +274,18 @@ MINODE* findval(MINODE *mip)
     return mip;
 }
 
-int search2(INODE *ip, char *name)
+int search2(INODE *pip, char *name)
 {
-  int size, count = 0;
+  int size;
   char buf[BLKSIZE];
-  size = ip->i_size;
-  get_block(fd, ip->i_block[0], buf);
+  char *cp;
+  size = pip->i_size;
+  get_block(fd, pip->i_block[0], buf);
 
   dp = (DIR *)buf;
+  cp = buf;
   char nameval[BLKSIZE + 1];
-  while(count < size && dp->inode)
+  while(cp < &buf[BLKSIZE])
   {
     memcpy(nameval, dp->name, dp->name_len);
     nameval[dp->name_len] = '\0';
@@ -289,8 +293,8 @@ int search2(INODE *ip, char *name)
 	{
 		return dp->inode;
 	}
-        dp = (void *)dp + dp->rec_len;
-        count+=dp->rec_len;
+        cp += dp->rec_len;
+        dp = (DIR*)cp;
   }
   return -1;
 }

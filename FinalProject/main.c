@@ -26,34 +26,7 @@ int main(int argc, char *argv[])
         {
             if(!strcmp(input, "ls"))
             {
-                if(name[0] == NULL)
-                {
-                    ls_dir(running->cwd);
-                }
-                else
-                {
-                    if(!strcmp(name[0], "/"))
-                        {printf("%sInhere\n", name[0]);
-                        pathfollow = findval(root);}
-                    else
-                    {
-                        printf("NOHERE\n");
-                        pathfollow = findval(running->cwd);
-                    }
-                    if(pathfollow != NULL)
-                    {
-                        if(checktype(pathfollow))
-                            ls_dir(pathfollow);
-                        else
-                        {
-                            while(name[i])
-                            {
-                                i++;
-                            }
-                            ls_file(pathfollow, name[i - 1]);
-                        }
-                    }
-                }
+                lsdo();
             }
             else if(!strcmp(input, "cd"))
             {

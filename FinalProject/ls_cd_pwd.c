@@ -2,6 +2,42 @@
 
 
 /*
+    Simply a middle ground that decides what should be passed
+    on ls call.
+*/
+void lsdo(void)
+{
+    int i = 0;
+    MINODE *pathfollow;
+    if(name[0] == NULL)
+    {
+        ls_dir(running->cwd);
+    }
+    else
+    {
+        if(!strcmp(name[0], "/"))
+            pathfollow = findval(root);
+        else
+        {
+            pathfollow = findval(running->cwd);
+        }
+        if(pathfollow != NULL)
+        {
+            if(checktype(pathfollow))
+                ls_dir(pathfollow);
+            else
+            {
+                while(name[i])
+                {
+                    i++;
+                }
+                ls_file(pathfollow, name[i - 1]);
+            }
+        }
+    }
+}
+
+/*
     Traverses through our directory mip, each file contained within
     mip is passed to ls_file to print it's contents.
 */
