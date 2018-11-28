@@ -40,7 +40,8 @@ int mdir(void)
         if(search2(pip, bname) == -1)
         {
             int ret = smkdir(parent, bname);
-            
+            pip->i_links_count++;
+            parent->dirty = 1;
             return ret;
         }
         printf("mkdir: cannot create directory '%s': File exists\n", bname);
@@ -80,11 +81,6 @@ int smkdir(MINODE *mip, char *bname)
         // Change new to dirty and write to disk
         new->dirty = 1;
         iput(new);
-        // Adjust parent node, add a link due to new
-        // dir and make dirty, then write to disk.
-        // PMip->i_links_count++;
-        // mip->dirty = 1;
-        // iput(mip);
 
         get_block(new->dev, pip->i_block[0], buf);
         ddp = (DIR*)buf;
@@ -106,7 +102,6 @@ int smkdir(MINODE *mip, char *bname)
         ddp->file_type = EXT2_FT_DIR;
         ddp->name_len = strlen("..");
         strcpy(ddp->name, "..");
-        printf("Write block\n");
         // Write block back to disk block
         put_block(new->dev, block, buf);
         enter_child(mip, ino, bname);

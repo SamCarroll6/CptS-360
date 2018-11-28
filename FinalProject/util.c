@@ -238,8 +238,8 @@ int search(INODE *pip, char *name)
         printf("===========================================\n");
 		return dp->inode;
 	}
-        cp += dp->rec_len;
-        dp = (DIR*)cp;
+    cp += dp->rec_len;
+    dp = (DIR*)cp;
   }
   printf("===========================================\n");
   return -1;
@@ -271,7 +271,7 @@ MINODE* findval(MINODE *mip)
             printf("Name %s does not exist\n", name[i]);
             return NULL;
         }
-        mip = iget(fd, ino);
+        mip = iget(mip->dev, ino);
         check = &mip->INODE;
         i++;
     }
@@ -297,8 +297,8 @@ int search2(INODE *pip, char *name)
 	{
 		return dp->inode;
 	}
-        cp += dp->rec_len;
-        dp = (DIR*)cp;
+    cp += dp->rec_len;
+    dp = (DIR*)cp;
   }
   return -1;
 }
