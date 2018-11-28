@@ -72,19 +72,19 @@ int  nblocks, ninodes, bmap, imap, inode_start;
 char line[256], cmd[32], pathname[256];
 
 // Utility/Mount Functions 
-int get_block(int fd, int blk, char buf[]);
-int put_block(int fd, int blk, char buf[]);
+int get_block(int mdev, int blk, char buf[]);
+int put_block(int mdev, int blk, char buf[]);
 int init(void);
 int mountroot(char *diskname);
-MINODE *iget(int dev, int ino);
+MINODE *iget(int mdev, int ino);
 int iput(MINODE *mip);
 int getino(MINODE *mip, char *name2);
-INODE *get_inode(int dev, int ino);
+INODE *get_inode(int mdev, int ino);
 char* Parse(char* input);
 char* readinput(void);
 int tokenize(char *pathname);
-int search(INODE *ip, char *name);
-int search2(INODE *ip, char *name);
+int search(INODE *pip, char *name);
+int search2(INODE *pip, char *name);
 
 // PWD, CD, LS functions
 void lsdo(void);
@@ -104,11 +104,13 @@ int tst_bit(char *buf, int bit);
 int set_bit(char *buf, int bit);
 int clr_bit(char *buf, int bit);
 int decFreeInodes(int dev);
+int decFreeClocks(int dev);
 int ialloc(int dev);
 int balloc(int dev);
 
 // MKDIR
 int mdir(void);
 int smkdir(MINODE *mip, char *bname);
+int enter_child(mip, ino, bname);
 
 #endif

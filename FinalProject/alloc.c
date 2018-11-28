@@ -87,7 +87,7 @@ int balloc(int dev)
   for (i=0; i < nblocks; i++){
     if (tst_bit(buf, i)==0){
        set_bit(buf,i);
-       decFreeInodes(dev);
+       decFreeBlocks(dev);
 
        put_block(dev, bmap, buf);
 

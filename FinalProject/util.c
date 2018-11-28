@@ -1,15 +1,17 @@
 #include "header.h"
 
-int get_block(int fd, int blk, char buf[])
+int get_block(int mdev, int blk, char buf[])
 {
-    lseek(fd, (long)blk*BLKSIZE, 0);
-    read(fd, buf, BLKSIZE);
+    lseek(mdev, (long)blk*BLKSIZE, 0);
+    read(mdev, buf, BLKSIZE);
+    return 1;
 }
 
-int put_block(int fd, int blk, char buf[])
+int put_block(int mdev, int blk, char buf[])
 {
-    lseek(fd, (long)blk*BLKSIZE, 0);
-    write(fd, buf, BLKSIZE);
+    lseek(mdev, (long)blk*BLKSIZE, 0);
+    write(mdev, buf, BLKSIZE);
+    return 1;
 }
 
 int mountroot(char *diskname)
@@ -60,14 +62,14 @@ int init(void)
     root = NULL;
 }
 
-MINODE *iget(int dev, int ino)
+MINODE *iget(int mdev, int ino)
 {
     MINODE *mip;
     int i = 0;
     for(i; i < NMINODE; i++)
     {
         mip = &minode[i];
-        if((mip->refCount) && (mip->dev == dev) && (mip->ino == ino))
+        if((mip->refCount) && (mip->dev == mdev) && (mip->ino == ino))
         {
             mip->refCount++;
             return mip;
@@ -78,12 +80,12 @@ MINODE *iget(int dev, int ino)
         mip = &minode[i];
         if(mip->refCount == 0)
         {
-            mip->dev = dev;
+            mip->dev = mdev;
             mip->ino = ino;
             mip->refCount++;
             mip->dirty = 0;
             mip->mounted = 0;
-            mip->INODE = *get_inode(dev, ino);
+            mip->INODE = *get_inode(mdev, ino);
             return mip;
         }
     }
@@ -96,19 +98,28 @@ int iput(MINODE *mip)
     char buf[BLKSIZE];
     INODE *pip;
     if(mip == NULL)
-        return;
+        return 0;
     mip->refCount--;
+    // If the ref count is greater than 0 
+    // and it's clean we can return.
     if(mip->refCount > 0 && !mip->dirty)
-        return;
-    int ino = getino(mip, ".");
+        return 0;
+    int ino = mip->ino;
     // 8 is the number of inodes per block
+    // find which disk block, and which inode 
+    // in that block
     int blk = (ino - 1) / 8 + inode_start;
     int offset = (ino - 1) % 8;
-    get_block(dev, blk, buf);
+    // get the disk block
+    get_block(mip->dev, blk, buf);
+    // use offset to get the inode spot
     pip = (INODE*)buf + offset;
+    // copy the inode from mip into this spot
     *pip = mip->INODE;
+    // write this back to the disk
     put_block(mip->dev, blk, buf);
     mip->dirty = 0;
+    return 0;
 }
 
 int getino(MINODE *mip, char *name2)
@@ -124,15 +135,15 @@ int getino(MINODE *mip, char *name2)
     return ino;
 }
 
-INODE *get_inode(int dev, int ino)
+INODE *get_inode(int mdev, int ino)
 {
     char buf[BLKSIZE];
     int blk, offset;
-    get_block(dev, inode_start, buf);
+    get_block(mdev, inode_start, buf);
     ip = (INODE*)buf + 1;
     blk = (ino - 1) / 8 + inode_start;
     offset = (ino - 1) % 8;
-    get_block(dev, blk, buf);
+    get_block(mdev, blk, buf);
     ip = (INODE*)buf + offset;
     return ip;
 }
@@ -201,15 +212,7 @@ int checktype(MINODE *mip)
     if(!mip)
         return 0;
     INODE* pip = &mip->INODE;
-    u16 mode = pip->i_mode;
-    u16 type = mode & 0xF000;
-    switch(type)
-    {
-        case 0x4000:
-            return 1;
-        default:
-            return 0;
-    }
+    return S_ISDIR(pip->i_mode);
 }
 
 int search(INODE *pip, char *name)
@@ -220,7 +223,6 @@ int search(INODE *pip, char *name)
   char buf[BLKSIZE];
   char *cp;
   size = pip->i_size;
-  printf("%d\n", size);
   get_block(fd, pip->i_block[0], buf);
 
   dp = (DIR *)buf;

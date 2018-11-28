@@ -83,22 +83,15 @@ void ls_file(MINODE* mip, char *name2)
     time_t val = pip->i_ctime;
     char *mtime = ctime(&val);
     mtime[strlen(mtime) - 1] = '\0';
-    //printf("0x%x\n", (mode & 0xF000));
-    u16 type = mode & 0xF000;
-    switch(type)
+    if(S_ISDIR(pip->i_mode))
+        putchar('d');
+    else if(S_ISREG(pip->i_mode))
+        putchar('-');
+    else if(S_ISLNK(pip->i_mode))
+        putchar('l');
+    else
     {
-        case 0x4000:
-            printf("d");
-            break;
-        case 0x8000:
-            printf("-");
-            break;
-        case 0xA000:
-            printf("l");
-            break;
-        default:
-            printf("-");
-            break;
+        putchar('-');
     }
     printf( (mode & S_IRUSR) ? "r" : "-");
     printf( (mode & S_IWUSR) ? "w" : "-");
