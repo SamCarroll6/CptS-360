@@ -232,7 +232,7 @@ int search(INODE *pip, char *name)
   {
     memcpy(nameval, dp->name, dp->name_len);
     nameval[dp->name_len] = '\0';
-    printf("%d\t  %d\t\t%d\t%s\n", dp->inode, dp->rec_len, dp->name_len, dp->name);
+    printf("%d\t  %d\t\t%d\t%s\n", dp->inode, dp->rec_len, dp->name_len, nameval);
 	if(!strcmp(nameval, name))
 	{
         printf("===========================================\n");
