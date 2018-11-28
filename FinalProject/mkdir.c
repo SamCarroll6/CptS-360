@@ -39,7 +39,9 @@ int mdir(void)
         INODE *pip = &parent->INODE;
         if(search2(pip, bname) == -1)
         {
-            return smkdir(parent, bname);
+            int ret = smkdir(parent, bname);
+            
+            return ret;
         }
         printf("mkdir: cannot create directory '%s': File exists\n", bname);
         return -1;
@@ -80,9 +82,9 @@ int smkdir(MINODE *mip, char *bname)
         iput(new);
         // Adjust parent node, add a link due to new
         // dir and make dirty, then write to disk.
-        PMip->i_links_count++;
-        mip->dirty = 1;
-        iput(mip);
+        // PMip->i_links_count++;
+        // mip->dirty = 1;
+        // iput(mip);
 
         get_block(new->dev, pip->i_block[0], buf);
         ddp = (DIR*)buf;
@@ -93,7 +95,7 @@ int smkdir(MINODE *mip, char *bname)
         // Last entry makes distance to BLKSIZE.
         ddp->rec_len = 4 * ((8 + 1 + 3) / 4);
         ddp->name_len = strlen(".");
-        ddp->name[0] = '.';
+        strcpy(ddp->name, ".");
 
         cp += ddp->rec_len;
         ddp = (DIR*)cp;
@@ -102,13 +104,13 @@ int smkdir(MINODE *mip, char *bname)
         // BLKSIZE - previous directories record length
         ddp->rec_len = BLKSIZE - 12;
         ddp->file_type = EXT2_FT_DIR;
-        dp->name_len = strlen("..");
-        dp->name[0] = '.';
-        dp->name[1] = '.';
+        ddp->name_len = strlen("..");
+        strcpy(ddp->name, "..");
         printf("Write block\n");
         // Write block back to disk block
         put_block(new->dev, block, buf);
         enter_child(mip, ino, bname);
+        iput(mip);
 
         return 1;
     }
@@ -119,13 +121,69 @@ int smkdir(MINODE *mip, char *bname)
 
 int enter_child(MINODE *mip, int ino, char *bname)
 {
-    int i = 0;
+    int i = 0, remain, len, need_len, ideal;
     INODE *Pinode = &mip->INODE;
     char buf[BLKSIZE];
     char *cp;
+    DIR *ddp;
+    len = strlen(bname);
+    need_len = 4 * ( ( 8 + len + 3 ) / 4);
 
-    // for(i; i < Pinode->i_size; i++)
-    // {
+    for(i; i < 12; i++)
+    {
+        if(!Pinode->i_block[i])
+            break;
+        
+        get_block(mip->dev, Pinode->i_block[i], buf);
 
-    // }
+        ddp = (DIR*)buf;
+        cp = buf;
+
+        while(cp + ddp->rec_len < buf + BLKSIZE)
+        {
+            cp += ddp->rec_len;
+            ddp = (DIR*)cp;
+        }
+        ideal = 4 * ( ( 8 + ddp->name_len + 3 ) / 4);
+        remain = ddp->rec_len - ideal;
+        
+        if(remain >= need_len)
+        {
+            ddp->rec_len = ideal;
+
+            cp += ddp->rec_len;
+            ddp = (DIR*)cp;
+
+            ddp->inode = ino;
+            ddp->file_type = EXT2_FT_DIR;
+            ddp->rec_len = remain;
+            ddp->name_len = len;
+            strcpy(ddp->name, bname);
+
+            put_block(mip->dev, Pinode->i_block[i], buf);
+
+            return 1;
+        }
+    }
+
+    int block = balloc(mip->dev);
+
+    Pinode->i_block[i] = block;
+    Pinode->i_size += BLKSIZE;
+
+    mip->dirty = 1;
+
+    get_block(mip->dev, block, buf);
+
+    dp = (DIR*)buf;
+    cp = buf;
+
+    ddp->inode = ino;
+    ddp->file_type = EXT2_FT_DIR;
+    // Full block because it has it all to itself
+    ddp->rec_len = BLKSIZE;
+    ddp->name_len = len;
+    strcpy(ddp->name, bname);
+    
+    put_block(mip->dev, block, buf);
 }
