@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
         int i = 0;
         while(paths[i])
         {
-            printf("%s\n", paths[i]);
+            printf("paths = %s\n", paths[i]);
             i++;
         }
         if(input != 0)
@@ -66,6 +66,13 @@ int main(int argc, char *argv[])
         while(name[i])
         {
             name[i] = NULL;
+            i++;
+        }
+        i = 0;
+        while(paths[i])
+        {
+            free(paths[i]);
+            paths[i] = NULL;
             i++;
         }
         input = NULL;
