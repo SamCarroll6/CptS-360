@@ -165,15 +165,18 @@ char* readinput(void)
 
 char* Parse(char* input)
 {
-    int i = 0;
+    int len, i = 0;
     char *token, *hold;
     token = strtok(input, " ");
-    printf("input = %s\n", input);
-    if(token = strtok(NULL, " "))
+    while(token = strtok(NULL, " "))
     {
-        return token;
+        len = strlen(token);
+        hold = (char*)malloc(len * sizeof(char));
+        strcpy(hold, token);
+        paths[i] = hold;
+        i++;
     }
-    return NULL;
+    return (i > 0) ? paths[0] : NULL;
 }
 
 int tokenize(char *pathname)
@@ -301,4 +304,27 @@ int search2(INODE *pip, char *name)
     dp = (DIR*)cp;
   }
   return -1;
+}
+
+int is_empty(MINODE *mip)
+{   
+    INODE *pip = &mip->INODE;
+    int size, i = 0;
+    char buf[BLKSIZE];
+    char *cp;
+    size = pip->i_size;
+    get_block(fd, pip->i_block[0], buf);
+
+    dp = (DIR *)buf;
+    cp = buf;
+    char nameval[BLKSIZE + 1];
+    while(cp < &buf[BLKSIZE])
+    {
+        memcpy(nameval, dp->name, dp->name_len);
+        nameval[dp->name_len] = '\0';
+        cp += dp->rec_len;
+        dp = (DIR*)cp;
+        i++;
+    }
+    return (i == 2) ? 1 : 0;
 }

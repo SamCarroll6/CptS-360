@@ -22,6 +22,11 @@ int main(int argc, char *argv[])
         hold = Parse(input);
         ret = tokenize(hold);
         int i = 0;
+        while(paths[i])
+        {
+            printf("%s\n", paths[i]);
+            i++;
+        }
         if(input != 0)
         {
             if(!strcmp(input, "ls"))
@@ -47,6 +52,10 @@ int main(int argc, char *argv[])
             else if(!strcmp(input, "creat"))
             {
                 creat_file();
+            }
+            else if(!strcmp(input, "rmdir"))
+            {
+                rm_dir();
             }
             else
             {

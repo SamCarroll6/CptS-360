@@ -64,7 +64,7 @@ MINODE *root;
 PROC   proc[NPROC], *running;
 
 char gpath[256];
-char *name[64]; // assume at most 64 components in pathnames
+char *name[64], *paths[64]; // assume at most 64 components in pathnames
 int  n;
 
 int  fd, dev;
@@ -85,6 +85,7 @@ char* readinput(void);
 int tokenize(char *pathname);
 int search(INODE *pip, char *name);
 int search2(INODE *pip, char *name);
+int is_empty(MINODE *mip);
 
 // PWD, CD, LS functions
 void lsdo(void);
@@ -108,6 +109,12 @@ int decFreeClocks(int dev);
 int ialloc(int dev);
 int balloc(int dev);
 
+// Deallocating functions and helpers
+int incfreeinodes(int dev);
+int incfreeblocks(int dev);
+int idalloc(int dev, int ino);
+int bdalloc(int dev, int bno);
+
 // MKDIR
 int mdir(void);
 int smkdir(MINODE *mip, char *bname);
@@ -116,5 +123,9 @@ int enter_child(mip, ino, bname);
 // Creat
 int creat_file(void);
 int mycreat(MINODE *mip, char *bname);
+
+// RMDIR
+int rm_dir(void);
+int rm_child(MINODE *pmip, char *name);
 
 #endif
