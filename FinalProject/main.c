@@ -44,6 +44,10 @@ int main(int argc, char *argv[])
             {
                 mdir();
             }
+            else if(!strcmp(input, "creat"))
+            {
+                creat_file();
+            }
             else
             {
                 printf("Error: Invalid command %s\n", input);

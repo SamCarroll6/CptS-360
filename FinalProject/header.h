@@ -113,4 +113,8 @@ int mdir(void);
 int smkdir(MINODE *mip, char *bname);
 int enter_child(mip, ino, bname);
 
+// Creat
+int creat_file(void);
+int mycreat(MINODE *mip, char *bname);
+
 #endif

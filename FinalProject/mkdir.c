@@ -86,6 +86,7 @@ int smkdir(MINODE *mip, char *bname)
         ddp = (DIR*)buf;
         cp = buf;
         ddp->inode = ino;
+        // EXT2_FT_DIR = 2, represents directory file.
         ddp->file_type = EXT2_FT_DIR;
         // Ideal rec length, this is for all except last entry
         // Last entry makes distance to BLKSIZE.
@@ -99,13 +100,13 @@ int smkdir(MINODE *mip, char *bname)
         ddp->inode = mip->ino;
         // BLKSIZE - previous directories record length
         ddp->rec_len = BLKSIZE - 12;
+        // EXT2_FT_DIR = 2, represents directory file.
         ddp->file_type = EXT2_FT_DIR;
         ddp->name_len = strlen("..");
         strcpy(ddp->name, "..");
         // Write block back to disk block
         put_block(new->dev, block, buf);
         enter_child(mip, ino, bname);
-        iput(mip);
 
         return 1;
     }
@@ -150,6 +151,8 @@ int enter_child(MINODE *mip, int ino, char *bname)
             ddp = (DIR*)cp;
 
             ddp->inode = ino;
+            // EXT2_FT_DIR = 2, represents directory file.
+            // EXT2_FT_REG_FILE = 1, represents regular file.
             ddp->file_type = EXT2_FT_DIR;
             ddp->rec_len = remain;
             ddp->name_len = len;
@@ -174,6 +177,7 @@ int enter_child(MINODE *mip, int ino, char *bname)
     cp = buf;
 
     ddp->inode = ino;
+    // EXT2_FT_DIR = 2, represents directory file.
     ddp->file_type = EXT2_FT_DIR;
     // Full block because it has it all to itself
     ddp->rec_len = BLKSIZE;
