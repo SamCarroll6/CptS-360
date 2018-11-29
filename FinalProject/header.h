@@ -96,7 +96,7 @@ int checktype(MINODE *mip);
 int chdir(void);
 int findmyname(MINODE *parent, u32 myino, char **myname);
 int findino(MINODE *mip, u32 myino);
-void pwd(MINODE *pr);
+void pwd(void);
 void rpwd(MINODE *pr);
 int quit(void);
 

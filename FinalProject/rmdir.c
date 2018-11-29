@@ -66,6 +66,7 @@ int rm_child(MINODE *pmip, char *name)
     int size;
     char buf[BLKSIZE];
     char *cp;
+    DIR *prev;
     size = pip->i_size;
     get_block(fd, pip->i_block[0], buf);
     dp = (DIR *)buf;
@@ -79,6 +80,7 @@ int rm_child(MINODE *pmip, char *name)
 	    {
 		    
 	    }
+        prev = dp;
         cp += dp->rec_len;
         dp = (DIR*)cp;
     }

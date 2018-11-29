@@ -22,11 +22,6 @@ int main(int argc, char *argv[])
         hold = Parse(input);
         ret = tokenize(hold);
         int i = 0;
-        while(paths[i])
-        {
-            printf("paths = %s\n", paths[i]);
-            i++;
-        }
         if(input != 0)
         {
             if(!strcmp(input, "ls"))
@@ -39,7 +34,7 @@ int main(int argc, char *argv[])
             }
             else if(!strcmp(input, "pwd"))
             {
-                pwd(running->cwd);
+                pwd();
             }
             else if(!strcmp(input, "quit"))
             {

@@ -191,8 +191,9 @@ int findino(MINODE *mip, u32 myino)
     Simple function, either print / if cwd is root
     or call rpwd on cwd if not. 
 */
-void pwd(MINODE *pr)
+void pwd(void)
 {
+    MINODE *pr = running->cwd;
     if(pr == root)
     {
         printf("/\n");

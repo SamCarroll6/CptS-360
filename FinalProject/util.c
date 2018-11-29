@@ -222,29 +222,34 @@ int search(INODE *pip, char *name)
 {
   printf("Search for %s\n", name);
   printf("i_block[0] = %d\n", pip->i_block[0]);
-  int size;
+  int size, i = 0;
   char buf[BLKSIZE];
   char *cp;
   size = pip->i_size;
-  get_block(fd, pip->i_block[0], buf);
-
-  dp = (DIR *)buf;
-  cp = buf;
-  char nameval[BLKSIZE + 1];
-  while(cp < &buf[BLKSIZE])
+  for(i; i < 12; i++)
   {
-    memcpy(nameval, dp->name, dp->name_len);
-    nameval[dp->name_len] = '\0';
-    printf("%d\t  %d\t\t%d\t%s\n", dp->inode, dp->rec_len, dp->name_len, nameval);
-	if(!strcmp(nameval, name))
-	{
-        printf("===========================================\n");
-		return dp->inode;
-	}
-    cp += dp->rec_len;
-    dp = (DIR*)cp;
+    if(pip->i_block[i] == 0)
+        return -1;
+    get_block(fd, pip->i_block[i], buf);
+
+    dp = (DIR *)buf;
+    cp = buf;
+    char nameval[BLKSIZE + 1];
+    while(cp < &buf[BLKSIZE])
+    {
+        memcpy(nameval, dp->name, dp->name_len);
+        nameval[dp->name_len] = '\0';
+        printf("%d\t  %d\t\t%d\t%s\n", dp->inode, dp->rec_len, dp->name_len, nameval);
+	    if(!strcmp(nameval, name))
+	    {
+            printf("===========================================\n");
+		    return dp->inode;
+	    }
+        cp += dp->rec_len;
+        dp = (DIR*)cp;
+    }
+    printf("===========================================\n");
   }
-  printf("===========================================\n");
   return -1;
 }
 
@@ -283,25 +288,31 @@ MINODE* findval(MINODE *mip)
 
 int search2(INODE *pip, char *name)
 {
-  int size;
+  int size, i = 0;
   char buf[BLKSIZE];
   char *cp;
   size = pip->i_size;
-  get_block(fd, pip->i_block[0], buf);
-
-  dp = (DIR *)buf;
-  cp = buf;
-  char nameval[BLKSIZE + 1];
-  while(cp < &buf[BLKSIZE])
+  // Search all direct blocks
+  for(i; i < 12; i++)
   {
-    memcpy(nameval, dp->name, dp->name_len);
-    nameval[dp->name_len] = '\0';
-	if(!strcmp(nameval, name))
-	{
-		return dp->inode;
-	}
-    cp += dp->rec_len;
-    dp = (DIR*)cp;
+    if(pip->i_block[i] == 0)
+        return -1;
+    get_block(fd, pip->i_block[i], buf);
+
+    dp = (DIR *)buf;
+    cp = buf;
+    char nameval[BLKSIZE + 1];
+    while(cp < &buf[BLKSIZE])
+    {
+        memcpy(nameval, dp->name, dp->name_len);
+        nameval[dp->name_len] = '\0';
+	    if(!strcmp(nameval, name))
+	    {
+	    	return dp->inode;
+	    }
+        cp += dp->rec_len;
+        dp = (DIR*)cp;
+    }
   }
   return -1;
 }
@@ -313,6 +324,8 @@ int is_empty(MINODE *mip)
     char buf[BLKSIZE];
     char *cp;
     size = pip->i_size;
+    // Only needs to check first direct block
+    // That's where first additional file would be.
     get_block(fd, pip->i_block[0], buf);
 
     dp = (DIR *)buf;
