@@ -26,18 +26,39 @@ int SERVER_IP, SERVER_PORT;
 int get(void)
 {
   // Client receives from server
-
+  int i = 0, b = 0, fd, n;
+  char *rec;
+  char *token, hold[64], name[64], bytes[16];
+  rec = (char*)malloc(sizeof(char) * MAX);
+  n = read(server_sock, rec, MAX);
+  if(!strcmp(rec, ""))
+  {
+    printf("get failed\n");
+    return 0;
+  }
+  strcpy(hold, rec);
+  token = strtok(hold, " ");
+  strcpy(name, token);
+  token = strtok(NULL, " ");
+  strcpy(bytes, token);
+  b = atoi(bytes);
+  fd = open(name, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+  free(rec);
+  rec = (char*)malloc(sizeof(char) * b);
+  n = read(server_sock, rec, b);
+  write(fd, rec, b * sizeof(char));
+  free(rec);
 }
 
 int put(void)
 {
+  // Client puts to server
   struct stat buf;
   char send[64], check[64];
   char *dname, *bname, *rec;
   int n, fd;
   dname = dirname(paths[1]);
   bname = basename(paths[1]);
-  // Client puts to server
   if(dname == NULL)
     dname = ".";
   if(stat(dname, &buf))
@@ -65,7 +86,6 @@ int put(void)
         rec = (char*)malloc(sizeof(char) * buf.st_size);
         read(fd, rec, buf.st_size);
         n = write(server_sock, rec, buf.st_size);
-        //n = write(server_sock, rec, MAX);
         free(rec);
         printf("File put\n");
         return 1;

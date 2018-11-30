@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <dirent.h>
+#include <libgen.h>
 #include <fcntl.h>
 
 #define  MAX 256
@@ -27,10 +28,10 @@ int  r, length, n;                   // help variables
 
 int put(void)
 {
+  // server receives from client
   int i = 0, b = 0, fd;
   char *rec;
   char *token, hold[64], name[64], bytes[16];
-  // server receives from client
   rec = (char*)malloc(sizeof(char) * MAX);
   n = read(client_sock, rec, MAX);
   if(!strcmp(rec, ""))
@@ -44,12 +45,6 @@ int put(void)
   token = strtok(NULL, " ");
   strcpy(bytes, token);
   b = atoi(bytes);
-  // while(bytes[i])
-  // {
-  //   b += atoi(bytes[i]);
-  //   b *= 10;
-  //   i++;
-  // }
   fd = open(name, O_WRONLY | O_CREAT | O_TRUNC, 0644);
   free(rec);
   rec = (char*)malloc(sizeof(char) * b);
@@ -60,9 +55,50 @@ int put(void)
 
 int get(void)
 {
-  char *send;
   // server puts to client
-
+  struct stat buf;
+  char send[64], check[64];
+  char *dname, *bname, *rec;
+  int n, fd;
+  dname = dirname(paths[1]);
+  bname = basename(paths[1]);
+  if(dname == NULL)
+    dname = ".";
+  if(stat(dname, &buf))
+  {
+    printf("get failed\n");
+    return 0;
+  }
+  if(S_ISDIR(buf.st_mode))
+  {
+    DIR *dir = opendir(dname);
+    struct dirent *file = readdir(dir);
+    if(dname[strlen(dname) - 1] == '/')
+      dname[strlen(dname) - 1] = '\0';
+    while(file)
+    {
+      if(!strcmp(file->d_name, bname))
+      {
+        int size = buf.st_size;
+        snprintf(check, sizeof(check), "%s/%s", dname, file->d_name);
+        stat(check, &buf);
+        snprintf(send, sizeof(send), "%s %d", file->d_name, buf.st_size);
+        n = write(client_sock, send, MAX);
+        snprintf(send, sizeof(send), "%s/%s", dname, bname);
+        fd = open(send, O_RDONLY);
+        rec = (char*)malloc(sizeof(char) * buf.st_size);
+        read(fd, rec, buf.st_size);
+        n = write(client_sock, rec, buf.st_size);
+        free(rec);
+        printf("File get\n");
+        return 1;
+      }
+      file = readdir(dir);
+    }
+    n = write(client_sock, "", MAX);
+    printf("get failed\n");
+    return 0;
+  }
 }
 
 int rmfun(void)
