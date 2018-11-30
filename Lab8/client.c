@@ -56,8 +56,6 @@ int client_init(char *argv[])
   printf("5 : connected OK to \007\n"); 
   printf("---------------------------------------------------------\n");
   inet_ntop(AF_INET, &SERVER_IP, serstr, INET_ADDRSTRLEN);
-  // printf("hostname=%s  IP=%s  PORT=%d\n", 
-  //         hp->h_name, inet_ntoa(SERVER_IP), SERVER_PORT);
   printf("hostname=%s  IP=%s  PORT=%d\n", 
           hp->h_name, serstr, SERVER_PORT);
   printf("---------------------------------------------------------\n");

@@ -14,6 +14,8 @@ struct hostent *hp;
 
 char serstr[INET_ADDRSTRLEN];
 
+char *paths[64];
+
 int  mysock, client_sock;              // socket descriptors
 int  serverPort;                     // server port number
 int  r, length, n;                   // help variables
@@ -77,10 +79,32 @@ int server_init(char *name)
 }
 
 
+void parse(char *input)
+{
+  int len, i = 0;
+  char *token, *hold;
+  token = strtok(input, " ");
+  paths[i] = token;
+  i++;
+  while(token = strtok(NULL, " "))
+  {
+    len = strlen(token);
+    hold = (char*)malloc(len * sizeof(char));
+    strcpy(hold, token);
+    paths[i] = hold;
+    i++;
+  }
+  return paths;
+}
+
+
 main(int argc, char *argv[])
 {
    char *hostname;
    char line[MAX];
+   char *ret;
+   int len = 0;
+   int i = 0;
 
    if (argc < 2)
       hostname = "localhost";
@@ -103,8 +127,6 @@ main(int argc, char *argv[])
      printf("server: accepted a client connection from\n");
      printf("-----------------------------------------------\n");
      inet_ntop(AF_INET, &client_addr.sin_addr.s_addr, serstr, INET_ADDRSTRLEN);
-    //  printf("        IP=%s  port=%d\n", inet_ntoa(client_addr.sin_addr.s_addr),
-    //                                     ntohs(client_addr.sin_port));
     printf("        IP=%s  port=%d\n", serstr, ntohs(client_addr.sin_port));
      printf("-----------------------------------------------\n");
 
@@ -120,13 +142,35 @@ main(int argc, char *argv[])
       // show the line string
       printf("server: read  n=%d bytes; line=[%s]\n", n, line);
 
-      strcat(line, " ECHO");
+     // strcat(line, " ECHO");
 
+      parse(line);
+        while(paths[i])
+        {
+          len += strlen(paths[i]);
+          i++;
+        }
+        ret = (char*)malloc((len*sizeof(char)) + 1);
+        ret[0] = '\0';
+        i = 0;
+        while(paths[i])
+        {
+          strcat(ret, paths[i]);
+          strcat(ret, "\n");
+          i++;
+        }
       // send the echo line to client 
-      n = write(client_sock, line, MAX);
-
+      n = write(client_sock, ret, MAX);
+  
       printf("server: wrote n=%d bytes; ECHO=[%s]\n", n, line);
       printf("server: ready for next request\n");
+      i = 0;
+      free(ret);
+      while(paths[i])
+      {
+        paths[i] = NULL;
+        i++;
+      }
     }
  }
 }
