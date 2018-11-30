@@ -24,6 +24,41 @@ int  serverPort;                     // server port number
 int  r, length, n;                   // help variables
 
 
+int rmfun(void)
+{
+  if(paths[1])
+  {
+    int i = 1;
+    while(paths[i])
+    {
+      if(!unlink(paths[i]))
+      {
+        printf("rm %s successful\n", paths[i]);
+        n = write(client_sock, "rm successful", MAX);
+      }
+      else
+      {
+        printf("rm %s unsuccessful\n", paths[i]);
+        n = write(client_sock, "rm unsuccessful", MAX);
+      }
+      i++;
+    }
+  }
+  else
+  {
+    printf("rm unsuccessful\n");
+    n = write(client_sock, "rm unsuccessful", MAX);
+  } 
+}
+
+int prwd(void)
+{
+  char buf[MAX];
+  getcwd(buf,MAX);
+  printf("%s\n",buf);
+  n = write(client_sock, buf, MAX);
+}
+
 int rdir(void)
 {
   if(paths[1])
@@ -301,6 +336,10 @@ main(int argc, char *argv[])
         cdir();
       else if(!strcmp(paths[0], "rmdir"))
         rdir();
+      else if(!strcmp(paths[0], "pwd"))
+        prwd();
+      else if(!strcmp(paths[0], "rm"))
+        rmfun();
       // send the echo line to client 
       // n = write(client_sock, line, MAX);
       n = write(client_sock, "", MAX);
