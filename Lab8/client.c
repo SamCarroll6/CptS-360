@@ -8,6 +8,8 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <dirent.h>
+#include <libgen.h>
+#include <fcntl.h>
 
 #define MAX 256
 
@@ -23,12 +25,57 @@ int SERVER_IP, SERVER_PORT;
 
 int get(void)
 {
+  // Client receives from server
 
 }
 
 int put(void)
 {
-
+  struct stat buf;
+  char send[64], check[64];
+  char *dname, *bname, *rec;
+  int n, fd;
+  dname = dirname(paths[1]);
+  bname = basename(paths[1]);
+  // Client puts to server
+  if(dname == NULL)
+    dname = ".";
+  if(stat(dname, &buf))
+  {
+    printf("put failed\n");
+    return 0;
+  }
+  if(S_ISDIR(buf.st_mode))
+  {
+    DIR *dir = opendir(dname);
+    struct dirent *file = readdir(dir);
+    if(dname[strlen(dname) - 1] == '/')
+      dname[strlen(dname) - 1] = '\0';
+    while(file)
+    {
+      if(!strcmp(file->d_name, bname))
+      {
+        int size = buf.st_size;
+        snprintf(check, sizeof(check), "%s/%s", dname, file->d_name);
+        stat(check, &buf);
+        snprintf(send, sizeof(send), "%s %d", file->d_name, buf.st_size);
+        n = write(server_sock, send, MAX);
+        snprintf(send, sizeof(send), "%s/%s", dname, bname);
+        fd = open(send, O_RDONLY);
+        rec = (char*)malloc(sizeof(char) * buf.st_size);
+        read(fd, rec, buf.st_size);
+        n = write(server_sock, rec, buf.st_size);
+        //n = write(server_sock, rec, MAX);
+        free(rec);
+        printf("File put\n");
+        return 1;
+      }
+      file = readdir(dir);
+    }
+    n = write(server_sock, "", MAX);
+    printf("put failed\n");
+    return 0;
+  }
 }
 
 void parse(char *input)
@@ -283,7 +330,7 @@ main(int argc, char *argv[ ])
         printf("End of command\n");
         break;
       }
-      else if(!strcmp(ans, "lls") || !strcmp(ans, "lmkdir") || !strcmp(ans, "lpwd") || !strcmp(ans, "lrm") || !strcmp(ans, "lrmdir") || !strcmp(ans, "lcd"))
+      else if(!strcmp(ans, "put") || !strcmp(ans, "get") || !strcmp(ans, "lls") || !strcmp(ans, "lmkdir") || !strcmp(ans, "lpwd") || !strcmp(ans, "lrm") || !strcmp(ans, "lrmdir") || !strcmp(ans, "lcd"))
       {
         parse(hold);
         break;
