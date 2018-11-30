@@ -12,6 +12,8 @@
 struct sockaddr_in  server_addr, client_addr, name_addr;
 struct hostent *hp;
 
+char serstr[INET_ADDRSTRLEN];
+
 int  mysock, client_sock;              // socket descriptors
 int  serverPort;                     // server port number
 int  r, length, n;                   // help variables
@@ -29,9 +31,10 @@ int server_init(char *name)
       printf("unknown host\n");
       exit(1);
    }
-   printf("    hostname=%s  IP=%s\n",
-               hp->h_name,  inet_ntoa(*(long *)hp->h_addr));
-  
+   inet_ntop(AF_INET, hp->h_addr, serstr, INET_ADDRSTRLEN);
+  printf("    hostname=%s  IP=%s\n",
+               hp->h_name,  serstr);
+
    //  create a TCP socket by socket() syscall
    printf("2 : create a socket\n");
    mysock = socket(AF_INET, SOCK_STREAM, 0);
@@ -99,8 +102,10 @@ main(int argc, char *argv[])
      }
      printf("server: accepted a client connection from\n");
      printf("-----------------------------------------------\n");
-     printf("        IP=%s  port=%d\n", inet_ntoa(client_addr.sin_addr.s_addr),
-                                        ntohs(client_addr.sin_port));
+     inet_ntop(AF_INET, &client_addr.sin_addr.s_addr, serstr, INET_ADDRSTRLEN);
+    //  printf("        IP=%s  port=%d\n", inet_ntoa(client_addr.sin_addr.s_addr),
+    //                                     ntohs(client_addr.sin_port));
+    printf("        IP=%s  port=%d\n", serstr, ntohs(client_addr.sin_port));
      printf("-----------------------------------------------\n");
 
      // Processing loop: newsock <----> client

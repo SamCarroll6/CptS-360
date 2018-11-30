@@ -11,6 +11,7 @@
 // Define variables
 struct hostent *hp;              
 struct sockaddr_in  server_addr; 
+char serstr[INET_ADDRSTRLEN];
 
 int server_sock, r;
 int SERVER_IP, SERVER_PORT; 
@@ -20,7 +21,7 @@ int SERVER_IP, SERVER_PORT;
 
 int client_init(char *argv[])
 {
-  printf("======= clinet init ==========\n");
+  printf("======= client init ==========\n");
 
   printf("1 : get server info\n");
   hp = gethostbyname(argv[1]);
@@ -54,8 +55,11 @@ int client_init(char *argv[])
 
   printf("5 : connected OK to \007\n"); 
   printf("---------------------------------------------------------\n");
+  inet_ntop(AF_INET, &SERVER_IP, serstr, INET_ADDRSTRLEN);
+  // printf("hostname=%s  IP=%s  PORT=%d\n", 
+  //         hp->h_name, inet_ntoa(SERVER_IP), SERVER_PORT);
   printf("hostname=%s  IP=%s  PORT=%d\n", 
-          hp->h_name, inet_ntoa(SERVER_IP), SERVER_PORT);
+          hp->h_name, serstr, SERVER_PORT);
   printf("---------------------------------------------------------\n");
 
   printf("========= init done ==========\n");
