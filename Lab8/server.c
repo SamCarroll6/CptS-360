@@ -5,6 +5,9 @@
 
 #include <sys/socket.h>
 #include <netdb.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <dirent.h>
 
 #define  MAX 256
 
@@ -19,6 +22,49 @@ char *paths[64];
 int  mysock, client_sock;              // socket descriptors
 int  serverPort;                     // server port number
 int  r, length, n;                   // help variables
+
+char *ls(char *pathname)
+{
+  struct stat buf;
+  char hold[64];
+  if(pathname == NULL)
+    pathname = ".";
+  if(stat(pathname, &buf))
+  {
+    strcpy(hold, "ls failed\n");
+    return hold;
+  }
+  if(S_ISDIR(buf.st_mode))
+  {
+    DIR *dir = opendir(pathname);
+    struct dirent *file = readdir(dir);
+    if(pathname[strlen(pathname) - 1] == '/')
+      pathname[strlen(pathname) - 1] = '\0';
+    while(file)
+    {
+      snprintf(hold, sizeof(hold), "%s/%s", pathname, file->d_name);
+      if(!stat(hold, &buf))
+      {
+        time_t val = buf.st_mtime;
+        char *mtime = ctime(&val);
+        mtime[strlen(mtime) - 1] = '\0';
+        printf((S_ISDIR(buf.st_mode)) ? "d" : "-");
+        printf((buf.st_mode & S_IRUSR) ? "r" : "-");
+        printf((buf.st_mode & S_IWUSR) ? "w" : "-");
+        printf((buf.st_mode & S_IXUSR) ? "x" : "-");
+        printf((buf.st_mode & S_IRGRP) ? "r" : "-");
+        printf((buf.st_mode & S_IWGRP) ? "w" : "-");
+        printf((buf.st_mode & S_IXGRP) ? "x" : "-");
+        printf((buf.st_mode & S_IROTH) ? "r" : "-");
+        printf((buf.st_mode & S_IWOTH) ? "w" : "-");
+        printf((buf.st_mode & S_IXOTH) ? "x" : "-");
+        printf(" %d %d %d %s %s\n", buf.st_nlink, buf.st_uid, buf.st_gid, mtime, file->d_name);
+      }
+      file = readdir(dir);
+    }
+  }
+}
+
 
 // Server initialization code:
 
@@ -153,6 +199,8 @@ main(int argc, char *argv[])
         ret = (char*)malloc((len*sizeof(char)) + 1);
         ret[0] = '\0';
         i = 0;
+        if(!strcmp(paths[0], "ls"))
+          ls(paths[1]);
         while(paths[i])
         {
           strcat(ret, paths[i]);
