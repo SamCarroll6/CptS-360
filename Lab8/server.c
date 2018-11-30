@@ -148,17 +148,6 @@ void ls_file(struct dirent *file, char *pathname)
     time_t val = buf.st_mtime;
     char *mtime = ctime(&val);
     mtime[strlen(mtime) - 1] = '\0';
-    // printf((S_ISDIR(buf.st_mode)) ? "d" : "-");
-    // printf((buf.st_mode & S_IRUSR) ? "r" : "-");
-    // printf((buf.st_mode & S_IWUSR) ? "w" : "-");
-    // printf((buf.st_mode & S_IXUSR) ? "x" : "-");
-    // printf((buf.st_mode & S_IRGRP) ? "r" : "-");
-    // printf((buf.st_mode & S_IWGRP) ? "w" : "-");
-    // printf((buf.st_mode & S_IXGRP) ? "x" : "-");
-    // printf((buf.st_mode & S_IROTH) ? "r" : "-");
-    // printf((buf.st_mode & S_IWOTH) ? "w" : "-");
-    // printf((buf.st_mode & S_IXOTH) ? "x" : "-");
-    // printf(" %d %d %d %s %s\n", buf.st_nlink, buf.st_uid, buf.st_gid, mtime, file->d_name);
     strcat(perm, (S_ISDIR(buf.st_mode)) ? "d" : "-");
     strcat(perm, (buf.st_mode & S_IRUSR) ? "r" : "-");
     strcat(perm, (buf.st_mode & S_IWUSR) ? "w" : "-");
@@ -170,7 +159,6 @@ void ls_file(struct dirent *file, char *pathname)
     strcat(perm, (buf.st_mode & S_IWOTH) ? "w" : "-");
     strcat(perm, (buf.st_mode & S_IXOTH) ? "x" : "-");
     snprintf(ret, sizeof(ret), "%s %d %d %d %s %s", perm, buf.st_nlink, buf.st_uid, buf.st_gid, mtime, file->d_name);
-    //printf("ret = %s\n",ret);
     n = write(client_sock, ret, MAX);
   }
 }
@@ -284,7 +272,7 @@ main(int argc, char *argv[])
 {
    char *hostname;
    char line[MAX];
-   int len = 0;
+   int len = 0, check = 1;
    int i = 0;
 
    if (argc < 2)
@@ -329,20 +317,50 @@ main(int argc, char *argv[])
       parse(line);
 
       if(!strcmp(paths[0], "ls"))
+      {
         ls_dir(paths[1]);
+        n = write(client_sock, "", MAX);
+      }
       else if(!strcmp(paths[0], "mkdir"))
+      {
         mdir();
+        n = write(client_sock, "", MAX);
+      }
       else if(!strcmp(paths[0], "cd"))
+      {
         cdir();
+        n = write(client_sock, "", MAX);
+      }
       else if(!strcmp(paths[0], "rmdir"))
+      {
         rdir();
+        n = write(client_sock, "", MAX);
+      }
       else if(!strcmp(paths[0], "pwd"))
+      {
         prwd();
+        n = write(client_sock, "", MAX);
+      }
       else if(!strcmp(paths[0], "rm"))
+      {
         rmfun();
+        n = write(client_sock, "", MAX);
+      }
+      else if(!strcmp(paths[0], "lls"))
+        n = write(client_sock, "lls", MAX);
+      else if(!strcmp(paths[0], "lmkdir"))
+        n = write(client_sock, "lmkdir", MAX);
+      else if(!strcmp(paths[0], "lcd"))
+        n = write(client_sock, "lcd", MAX);
+      else if(!strcmp(paths[0], "lrmdir"))
+        n = write(client_sock, "lrmdir", MAX);
+      else if(!strcmp(paths[0], "lpwd"))
+        n = write(client_sock, "lpwd", MAX);
+      else if(!strcmp(paths[0], "lrm"))
+        n = write(client_sock, "lrm", MAX);
       // send the echo line to client 
       // n = write(client_sock, line, MAX);
-      n = write(client_sock, "", MAX);
+      // n = write(client_sock, "", MAX);
       printf("server: wrote n=%d bytes; ECHO=[%s]\n", n, line);
       printf("server: ready for next request\n");
       i = 0;
