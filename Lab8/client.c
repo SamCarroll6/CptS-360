@@ -90,8 +90,17 @@ main(int argc, char *argv[ ])
     printf("client: wrote n=%d bytes; line=(%s)\n", n, line);
 
     // Read a line from sock and show it
-    n = read(server_sock, ans, MAX);
-    printf("client: read  n=%d bytes; echo=(%s)\n",n, ans);
+    while(1)
+    {
+      n = read(server_sock, ans, MAX);
+      if(!strcmp(ans, ""))
+      {
+        printf("End of command\n");
+        break;
+      }
+      printf("%s\n", ans);
+      //printf("client: read  n=%d bytes; echo=(%s)\n",n, ans);
+    }
   }
 }
 

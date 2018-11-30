@@ -23,10 +23,128 @@ int  mysock, client_sock;              // socket descriptors
 int  serverPort;                     // server port number
 int  r, length, n;                   // help variables
 
-char *ls(char *pathname)
+
+int rdir(void)
+{
+  if(paths[1])
+  {
+    int i = 1;
+    while(paths[i])
+    {
+      if(!rmdir(paths[i]))
+      {
+        printf("rmdir %s successful\n", paths[i]);
+        n = write(client_sock, "rmdir successful", MAX);
+      }
+      else
+      {
+        printf("rmdir %s unsuccessful\n", paths[i]);
+        n = write(client_sock, "rmdir unsuccessful", MAX);
+      }
+      i++;
+    }
+  }
+  else
+  {
+    printf("rmdir unsuccessful\n");
+    n = write(client_sock, "rmdir unsuccessful", MAX);
+  }
+}
+
+int mdir(void)
+{
+  if(paths[1])
+  {
+    int i = 1;
+    while(paths[i])
+    {
+      if(!mkdir(paths[i], 0755))
+      {
+        printf("mkdir %s successful\n", paths[i]);
+        n = write(client_sock, "mkdir successful", MAX);
+      }
+      else
+      {
+        printf("mkdir %s unsuccessful\n", paths[i]);
+        n = write(client_sock, "mkdir unsuccessful", MAX);
+      }
+      i++;
+    }
+  }
+  else
+  {
+    printf("mkdir unsuccessful\n");
+    n = write(client_sock, "mkdir unsuccessful", MAX);
+  }
+}
+
+int cdir(void)
+{
+  if(paths[1])
+  {
+    if(!chdir(paths[1]))
+      {
+        printf("chdir %s successful\n", paths[1]);
+        n = write(client_sock, "chdir successful", MAX);
+      }
+    else 
+    {  
+      printf("chdir %s unsuccessful\n", paths[1]);
+      n = write(client_sock, "chdir unsuccessful", MAX);
+    }
+  }
+  else
+  {
+    chdir("/");
+    printf("chdir / successful");
+    n = write(client_sock, "chdir successful", MAX);
+  }  
+}
+
+void ls_file(struct dirent *file, char *pathname)
+{
+  char hold[64];
+  char ret[128], perm[11] = {'\0'};
+  struct stat buf;
+  snprintf(hold, sizeof(hold), "%s/%s", pathname, file->d_name);
+  printf("ls %s\n", hold);
+  if(!stat(hold, &buf))
+  {
+    time_t val = buf.st_mtime;
+    char *mtime = ctime(&val);
+    mtime[strlen(mtime) - 1] = '\0';
+    // printf((S_ISDIR(buf.st_mode)) ? "d" : "-");
+    // printf((buf.st_mode & S_IRUSR) ? "r" : "-");
+    // printf((buf.st_mode & S_IWUSR) ? "w" : "-");
+    // printf((buf.st_mode & S_IXUSR) ? "x" : "-");
+    // printf((buf.st_mode & S_IRGRP) ? "r" : "-");
+    // printf((buf.st_mode & S_IWGRP) ? "w" : "-");
+    // printf((buf.st_mode & S_IXGRP) ? "x" : "-");
+    // printf((buf.st_mode & S_IROTH) ? "r" : "-");
+    // printf((buf.st_mode & S_IWOTH) ? "w" : "-");
+    // printf((buf.st_mode & S_IXOTH) ? "x" : "-");
+    // printf(" %d %d %d %s %s\n", buf.st_nlink, buf.st_uid, buf.st_gid, mtime, file->d_name);
+    strcat(perm, (S_ISDIR(buf.st_mode)) ? "d" : "-");
+    strcat(perm, (buf.st_mode & S_IRUSR) ? "r" : "-");
+    strcat(perm, (buf.st_mode & S_IWUSR) ? "w" : "-");
+    strcat(perm, (buf.st_mode & S_IXUSR) ? "x" : "-");
+    strcat(perm, (buf.st_mode & S_IRGRP) ? "r" : "-");
+    strcat(perm, (buf.st_mode & S_IWGRP) ? "w" : "-");
+    strcat(perm, (buf.st_mode & S_IXGRP) ? "x" : "-");
+    strcat(perm, (buf.st_mode & S_IROTH) ? "r" : "-");
+    strcat(perm, (buf.st_mode & S_IWOTH) ? "w" : "-");
+    strcat(perm, (buf.st_mode & S_IXOTH) ? "x" : "-");
+    snprintf(ret, sizeof(ret), "%s %d %d %d %s %s", perm, buf.st_nlink, buf.st_uid, buf.st_gid, mtime, file->d_name);
+    //printf("ret = %s\n",ret);
+    n = write(client_sock, ret, MAX);
+  }
+}
+
+char *ls_dir(char *pathname)
 {
   struct stat buf;
   char hold[64];
+  char ret[2048];
   if(pathname == NULL)
     pathname = ".";
   if(stat(pathname, &buf))
@@ -42,24 +160,7 @@ char *ls(char *pathname)
       pathname[strlen(pathname) - 1] = '\0';
     while(file)
     {
-      snprintf(hold, sizeof(hold), "%s/%s", pathname, file->d_name);
-      if(!stat(hold, &buf))
-      {
-        time_t val = buf.st_mtime;
-        char *mtime = ctime(&val);
-        mtime[strlen(mtime) - 1] = '\0';
-        printf((S_ISDIR(buf.st_mode)) ? "d" : "-");
-        printf((buf.st_mode & S_IRUSR) ? "r" : "-");
-        printf((buf.st_mode & S_IWUSR) ? "w" : "-");
-        printf((buf.st_mode & S_IXUSR) ? "x" : "-");
-        printf((buf.st_mode & S_IRGRP) ? "r" : "-");
-        printf((buf.st_mode & S_IWGRP) ? "w" : "-");
-        printf((buf.st_mode & S_IXGRP) ? "x" : "-");
-        printf((buf.st_mode & S_IROTH) ? "r" : "-");
-        printf((buf.st_mode & S_IWOTH) ? "w" : "-");
-        printf((buf.st_mode & S_IXOTH) ? "x" : "-");
-        printf(" %d %d %d %s %s\n", buf.st_nlink, buf.st_uid, buf.st_gid, mtime, file->d_name);
-      }
+      ls_file(file, pathname);
       file = readdir(dir);
     }
   }
@@ -148,7 +249,6 @@ main(int argc, char *argv[])
 {
    char *hostname;
    char line[MAX];
-   char *ret;
    int len = 0;
    int i = 0;
 
@@ -158,7 +258,7 @@ main(int argc, char *argv[])
       hostname = argv[1];
  
    server_init(hostname); 
-
+   chdir("/");
    // Try to accept a client request
    while(1){
      printf("server: accepting new connection ....\n"); 
@@ -179,11 +279,12 @@ main(int argc, char *argv[])
      // Processing loop: newsock <----> client
      while(1){
        n = read(client_sock, line, MAX);
-       if (n==0){
+       if (n==0)
+        {
            printf("server: client died, server loops\n");
            close(client_sock);
            break;
-      }
+        }
       
       // show the line string
       printf("server: read  n=%d bytes; line=[%s]\n", n, line);
@@ -191,29 +292,21 @@ main(int argc, char *argv[])
      // strcat(line, " ECHO");
 
       parse(line);
-        while(paths[i])
-        {
-          len += strlen(paths[i]);
-          i++;
-        }
-        ret = (char*)malloc((len*sizeof(char)) + 1);
-        ret[0] = '\0';
-        i = 0;
-        if(!strcmp(paths[0], "ls"))
-          ls(paths[1]);
-        while(paths[i])
-        {
-          strcat(ret, paths[i]);
-          strcat(ret, "\n");
-          i++;
-        }
+
+      if(!strcmp(paths[0], "ls"))
+        ls_dir(paths[1]);
+      else if(!strcmp(paths[0], "mkdir"))
+        mdir();
+      else if(!strcmp(paths[0], "cd"))
+        cdir();
+      else if(!strcmp(paths[0], "rmdir"))
+        rdir();
       // send the echo line to client 
-      n = write(client_sock, ret, MAX);
-  
+      // n = write(client_sock, line, MAX);
+      n = write(client_sock, "", MAX);
       printf("server: wrote n=%d bytes; ECHO=[%s]\n", n, line);
       printf("server: ready for next request\n");
       i = 0;
-      free(ret);
       while(paths[i])
       {
         paths[i] = NULL;
