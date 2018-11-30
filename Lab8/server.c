@@ -24,6 +24,16 @@ int  serverPort;                     // server port number
 int  r, length, n;                   // help variables
 
 
+int put(void)
+{
+  
+}
+
+int get(void)
+{
+
+}
+
 int rmfun(void)
 {
   if(paths[1])
@@ -358,6 +368,16 @@ main(int argc, char *argv[])
         n = write(client_sock, "lpwd", MAX);
       else if(!strcmp(paths[0], "lrm"))
         n = write(client_sock, "lrm", MAX);
+      else if(!strcmp(paths[0], "get"))
+      {
+        n = write(client_sock, "get", MAX);
+        get();
+      }
+      else if(!strcmp(paths[0], "put"))
+      {
+        n = write(client_sock, "put", MAX);
+        put();
+      }
       // send the echo line to client 
       // n = write(client_sock, line, MAX);
       // n = write(client_sock, "", MAX);

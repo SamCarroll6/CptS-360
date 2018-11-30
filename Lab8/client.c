@@ -21,6 +21,16 @@ int server_sock, r;
 int SERVER_IP, SERVER_PORT; 
 
 
+int get(void)
+{
+
+}
+
+int put(void)
+{
+
+}
+
 void parse(char *input)
 {
   int len, i = 0;
@@ -292,6 +302,10 @@ main(int argc, char *argv[ ])
         prwd();
       else if(!strcmp(ans, "lrm"))
         rmfun();
+      else if(!strcmp(ans, "get"))
+        get();
+      else if(!strcmp(ans, "put"))
+        put();
       i = 0;
       while(paths[i])
       {
