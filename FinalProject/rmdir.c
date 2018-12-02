@@ -47,8 +47,8 @@ int rm_dir(void)
     // '.' from it's actual parent.
     if(!strcmp(bname, "."))
     {
-        strcpy(bname, name[i-1]);
-        name[i-1] == NULL;
+        printf("Error: failed to remove '.': Invalid argument\n");
+        return -1;
     }
     // Get MINODE of parent to path
     if(name[0] == NULL)
