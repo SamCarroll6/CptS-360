@@ -167,6 +167,8 @@ char* Parse(char* input)
 {
     int len, i = 0;
     char *token, *hold;
+    // Parse function by spaces
+    // Store each input in variable paths[i]
     token = strtok(input, " ");
     while(token = strtok(NULL, " "))
     {

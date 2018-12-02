@@ -9,13 +9,17 @@ int mdir(void)
         printf("Usage: mkdir requires pathname\n");
         return -1;
     }
+    // Get last value for name of actual new dir
     while(name[i])
     {
         i++;
     }
     i = i - 1;
     char bname[64];
+    // Copy found name to bname
     strcpy(bname, name[i]);
+    // Set name[i] to NULL so it doesn't cause 
+    // errors later when path is searched for location
     name[i] = NULL;
     if(!strcmp(bname, "/"))
     {
