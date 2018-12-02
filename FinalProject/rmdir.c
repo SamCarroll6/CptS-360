@@ -136,22 +136,24 @@ int rm_child(MINODE *pmip, char *name)
                 // or start of a block with other records.
                 else
                 {
-                    int holdreclen = dp->rec_len;
+                    DIR *find_end = (DIR*)buf;
+                    char *final_cp = buf;
                     // While loop to get the last entry in block.
-                    while(cp + dp->rec_len < &buf[BLKSIZE])
+                    while(final_cp + find_end->rec_len < &buf[BLKSIZE])
                     {
-                        cp += dp->rec_len;
-                        dp = (DIR*)cp;
+                        final_cp += find_end->rec_len;
+                        find_end = (DIR*)final_cp;
                     }
-                    dp->rec_len += holdreclen;
+                    find_end->rec_len += dp->rec_len;
                     // Move all records to the left to ensure
                     // data still fits.
-                    char *moveS = cp + holdreclen;
-                    char *moveE = &buf[BLKSIZE];
-                    memmove(cp, moveS, moveS-moveE);
+                    char *moveS = cp + dp->rec_len;
+                    char *moveE = buf + BLKSIZE;
+                    // C function to move memory to the left.
+                    memmove(cp, moveS, moveE-moveS);
                     put_block(pmip->dev, pip->i_block[i], buf);
-
                 }
+                return 1;
 	        }
             prev = dp;
             cp += dp->rec_len;
