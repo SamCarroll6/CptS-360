@@ -129,6 +129,7 @@ int rm_dir(void);
 int rm_child(MINODE *pmip, char *name);
 
 // SYMLINK
-int symlink(void);
+int mysymlink(void);
+char* myreadlink(void);
 
 #endif

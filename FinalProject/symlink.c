@@ -1,11 +1,13 @@
 #include "header.h"
 
-int symlink(void)
+int mysymlink(void)
 {
     MINODE *Path1, *Path2;
     char *P0, *P1;
     if(name[0] && paths[1])
     {
+        // Making copies because I want to avoid tokenizing 
+        // originals as I need it intact.
         P0 = (char*)malloc(strlen(paths[0]) * sizeof(char));
         P1 = (char*)malloc(strlen(paths[1]) * sizeof(char));
         strcpy(P0, pathname);
@@ -17,6 +19,11 @@ int symlink(void)
         else
         {
             Path1 = findval(running->cwd);
+        }
+        if(!Path1)
+        {
+            printf("Error: Could not find file1\n");
+            return -1;
         }
         INODE *check = &Path1->INODE;
         if(!S_ISREG(check->i_mode) && !S_ISDIR(check->i_mode))
@@ -51,6 +58,11 @@ int symlink(void)
         {
             Path2 = findval(running->cwd);
         }
+        if(!Path2)
+        {
+            printf("Error: Could not find file2\n");
+            return -1;
+        }
         INODE *pip = &Path2->INODE;
         pip->i_mode = 0120000;
         // if the strlen of the path is less than 60
@@ -68,5 +80,35 @@ int symlink(void)
         return 1;
     }
     printf("Usage: symlink file1 file2\n");
+    return -1;
+}
+
+char* myreadlink(void)
+{
+    MINODE *mip; 
+    if(name[0] == NULL)
+    {
+        printf("Usage: readlink file1\n");
+        return -1;
+    }
+    if(!strcmp(name[0], "/"))
+    {
+        mip = findval(root);
+    }
+    else
+    {
+        mip = findval(running->cwd);
+    }
+    if(mip)
+    {
+        INODE *pip = &mip->INODE;
+        if(S_ISLNK(pip->i_mode))
+        {
+            char buf[64];
+            strcpy(buf, (char*)pip->i_block);
+            return buf;
+        }
+        printf("Error: file1 must be type link\n");
+    }
     return -1;
 }

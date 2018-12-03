@@ -88,7 +88,14 @@ void ls_file(MINODE* mip, char *name2)
     else if(S_ISREG(pip->i_mode))
         putchar('-');
     else if(S_ISLNK(pip->i_mode))
+    {
         putchar('l');
+        char buf[64];
+        strcpy(buf, name2);
+        strcat(buf, " -> ");
+        strcat(buf, (char*)pip->i_block);
+        name2 = &buf[0];
+    }
     else
     {
         putchar('-');

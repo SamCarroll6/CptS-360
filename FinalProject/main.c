@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
             }
             else if(!strcmp(input, "symlink"))
             {
-                symlink();
+                mysymlink();
             }
             else
             {
