@@ -52,17 +52,21 @@ int main(int argc, char *argv[])
             {
                 rm_dir();
             }
+            else if(!strcmp(input, "symlink"))
+            {
+                symlink();
+            }
             else
             {
                 printf("Error: Invalid command %s\n", input);
             }
         }
-        i = 0;
-        while(name[i])
-        {
-            name[i] = NULL;
-            i++;
-        }
+        // i = 0;
+        // while(name[i])
+        // {
+        //     name[i] = NULL;
+        //     i++;
+        // }
         i = 0;
         while(paths[i])
         {

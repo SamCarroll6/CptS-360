@@ -42,6 +42,7 @@ int creat_file(void)
             int ret = mycreat(parent, bname);
             pip->i_links_count++;
             parent->dirty = 1;
+            iput(parent);
             return ret;
         }
         printf("creat: cannot create file '%s': File exists\n", bname);
@@ -60,10 +61,10 @@ int mycreat(MINODE *mip, char *bname)
     if(ino != 0)
     {
         MINODE *new = iget(mip->dev, ino);
-        INODE *pip = &(new->INODE), *PMip = &(mip->INODE);
-        // 001 => directory, 644 => permissions
+        INODE *pip = &new->INODE, *PMip = &mip->INODE;
+        // 0x81A4 is type file.
         // Write all the information to new inode
-        pip->i_mode = 0010644;
+        pip->i_mode = 0x81A4;
         for(i = 0; i < 12; i++)
         {
             pip->i_block[i] = 0;

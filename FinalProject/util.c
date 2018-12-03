@@ -183,11 +183,17 @@ char* Parse(char* input)
 
 int tokenize(char *pathname)
 {
+    int i = 0;
+    while(name[i])
+    {
+        name[i] = NULL;
+        i++;
+    }
     printf("path = %s\n", pathname);
     if(pathname == NULL)
         return 0;
     char *token;
-    int i = 0;
+    i = 0;
     if(pathname[0] == '/')
     {
         name[i] = "/";

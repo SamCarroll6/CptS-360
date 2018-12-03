@@ -128,4 +128,7 @@ int mycreat(MINODE *mip, char *bname);
 int rm_dir(void);
 int rm_child(MINODE *pmip, char *name);
 
+// SYMLINK
+int symlink(void);
+
 #endif
