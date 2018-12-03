@@ -3,8 +3,13 @@
 int symlink(void)
 {
     MINODE *Path1, *Path2;
+    char *P0, *P1;
     if(name[0] && paths[1])
     {
+        P0 = (char*)malloc(strlen(paths[0]) * sizeof(char));
+        P1 = (char*)malloc(strlen(paths[1]) * sizeof(char));
+        strcpy(P0, pathname);
+        strcpy(P1, paths[1]);
         if(!strcmp(name[0], "/"))
         {
             Path1 = findval(root);
@@ -20,13 +25,14 @@ int symlink(void)
             return -1;
         }
         // Filename length can't be longer than 60.
-        if(strlen(paths[0]) >= 60)
+        if(strlen(P0) >= 60)
         {
             printf("Error: file1 name too large symlnk failed\n");
             return -1;
         }
         // change name[] from file1 to file2
-        tokenize(paths[1]);
+        // tokenize(paths[1]);
+        tokenize(P1);
         if(creat_file() == -1)
         {
             printf("Error: symlink failed\n");
@@ -34,7 +40,9 @@ int symlink(void)
         }
         // creat_file overwrites name[] so we'll
         // recreate it again.
-        tokenize(paths[1]);
+        strcpy(P1, paths[1]);
+        // tokenize(paths[1]);
+        tokenize(P1);
         if(!strcmp(name[0], "/"))
         {
             Path2 = findval(root);
@@ -48,13 +56,15 @@ int symlink(void)
         // if the strlen of the path is less than 60
         // store the name because it fits 
         // according to KC you have room for 60.
-        strcpy(pip->i_block, paths[0]);
+        strcpy(pip->i_block, P0);
         printf("%s\n", (char*)pip->i_block);
-        pip->i_size = strlen(paths[0]);
+        pip->i_size = strlen(P0);
         Path2->dirty = 1;
         iput(Path2);
         // if not just store the size for read link to
         // use.
+        free(P0);
+        free(P1);
         return 1;
     }
     printf("Usage: symlink file1 file2\n");

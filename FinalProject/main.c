@@ -20,6 +20,9 @@ int main(int argc, char *argv[])
     {
         input = readinput();
         hold = Parse(input);
+        // store an unmodified copy of paths[0]
+        if(hold)
+            strcpy(pathname, paths[0]);
         ret = tokenize(hold);
         int i = 0;
         if(input != 0)
