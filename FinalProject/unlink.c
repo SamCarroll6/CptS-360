@@ -50,6 +50,7 @@ int myunlink(void)
                 parent = findval(running->cwd);
             }
             rm_child(parent, bname);
+            return 1;
         }
         printf("Error: Pathname must be of type link or regular file\n");
     }
