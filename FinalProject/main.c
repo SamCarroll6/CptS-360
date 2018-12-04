@@ -59,6 +59,10 @@ int main(int argc, char *argv[])
             {
                 mysymlink();
             }
+            else if(!strcmp(input, "link"))
+            {
+                link();
+            }
             else
             {
                 printf("Error: Invalid command %s\n", input);

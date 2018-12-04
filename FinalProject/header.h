@@ -131,5 +131,6 @@ int rm_child(MINODE *pmip, char *name);
 // SYMLINK
 int mysymlink(void);
 char* myreadlink(void);
+int link(void);
 
 #endif

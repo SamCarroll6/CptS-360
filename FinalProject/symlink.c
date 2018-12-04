@@ -64,7 +64,7 @@ int mysymlink(void)
             return -1;
         }
         INODE *pip = &Path2->INODE;
-        pip->i_mode = 0120000;
+        pip->i_mode = 0120777;
         // if the strlen of the path is less than 60
         // store the name because it fits 
         // according to KC you have room for 60.
