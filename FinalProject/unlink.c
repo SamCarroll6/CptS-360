@@ -25,8 +25,8 @@ int myunlink(void)
                 {
                     bdalloc(mip->dev, pip->i_block[i]);
                 }
+                 idalloc(mip->dev, mip->ino);
             }
-            idalloc(mip->dev, mip->ino);
             i = 0;
             while(name[i])
             {

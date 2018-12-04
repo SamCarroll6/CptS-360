@@ -66,7 +66,8 @@ int link(void)
         if(checktype(parent))
         {
             INODE *pip = &Path1->INODE;
-            if(search2(pip, bname) == -1)
+            INODE *Parip = &parent->INODE;
+            if(search2(Parip, bname) == -1)
             {
                 enter_child(parent, ino, bname);
                 pip->i_links_count++;
@@ -76,7 +77,7 @@ int link(void)
                 iput(parent);
                 return 1;
             }
-            printf("mkdir: cannot create directory '%s': File exists\n", bname);
+            printf("Error: cannot create link '%s': File exists\n", bname);
             return -1;
         }
     }

@@ -136,5 +136,6 @@ int myunlink(void);
 
 // Touch and CHMOD
 int touch(void);
+int mychmod(void);
 
 #endif
