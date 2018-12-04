@@ -63,6 +63,10 @@ int main(int argc, char *argv[])
             {
                 link();
             }
+            else if(!strcmp(input, "touch"))
+            {
+                touch();
+            }
             else
             {
                 printf("Error: Invalid command %s\n", input);

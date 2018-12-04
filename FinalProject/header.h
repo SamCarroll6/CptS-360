@@ -128,9 +128,12 @@ int mycreat(MINODE *mip, char *bname);
 int rm_dir(void);
 int rm_child(MINODE *pmip, char *name);
 
-// SYMLINK
+// SYMLINK, LINK, UNLINK
 int mysymlink(void);
 char* myreadlink(void);
 int link(void);
+
+// Touch and CHMOD
+int touch(void);
 
 #endif
