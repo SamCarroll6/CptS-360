@@ -132,6 +132,7 @@ int rm_child(MINODE *pmip, char *name);
 int mysymlink(void);
 char* myreadlink(void);
 int link(void);
+int myunlink(void);
 
 // Touch and CHMOD
 int touch(void);

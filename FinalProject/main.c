@@ -67,6 +67,10 @@ int main(int argc, char *argv[])
             {
                 touch();
             }
+            else if(!strcmp(input, "unlink"))
+            {
+                myunlink();
+            }
             else
             {
                 printf("Error: Invalid command %s\n", input);

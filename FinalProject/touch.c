@@ -20,6 +20,8 @@ int touch(void)
         }
         INODE *pip = &Path1->INODE;
         pip->i_ctime = time(NULL);
+        Path1->dirty = 1;
+        iput(Path1);
         return 1;
     }
     printf("Usage: touch requires pathname\n");

@@ -65,7 +65,15 @@ int rm_dir(void)
     }
     if(checktype(path) && is_empty(path))
     {
-        INODE *pip = &parent->INODE;
+        INODE *pip = &parent->INODE, *cip = &path->INODE;
+        // Deallocate blocks in dir to be removed. 
+        for(i = 0; i < 12 && cip->i_block[i] != 0; i++)
+        {
+            bdalloc(path->dev, cip->i_block[i]);
+        }
+        // deallocate ino in dir to be removed.
+        idalloc(path->dev, path->ino);
+        iput(path);
         int ret = rm_child(parent, bname);
         return ret;
     }
@@ -104,7 +112,7 @@ int rm_child(MINODE *pmip, char *name)
                 // and if cp + dp->rec_len = the end of the block.
                 if(cp == buf && cp + dp->rec_len == &buf[BLKSIZE])
                 {
-                    // deallocate block
+                    // deallocate parents block i
                     bdalloc(pmip->dev, pip->i_block[i]);
                     // decrement parent size
                     pip->i_size -= BLKSIZE;
