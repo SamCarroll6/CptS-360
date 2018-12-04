@@ -71,6 +71,10 @@ int main(int argc, char *argv[])
             {
                 myunlink();
             }
+            else if(!strcmp(input, "chmod"))
+            {
+                mychmod();
+            }
             else
             {
                 printf("Error: Invalid command %s\n", input);
