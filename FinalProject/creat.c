@@ -1,5 +1,9 @@
 #include "header.h"
 
+/*
+    Find parent directory and bname of new file. Ensure 
+    parent is a directory and then pass along to mycreat()
+*/
 int creat_file(void)
 {
     int i = 0;
@@ -9,6 +13,7 @@ int creat_file(void)
         printf("Usage: creat requires pathname\n");
         return -1;
     }
+    // Get bname of new file to be made
     while(name[i])
     {
         i++;
@@ -22,6 +27,7 @@ int creat_file(void)
         printf("creat: cannot create file '/': File exists\n");
         return -1;
     }
+    // Find parents MINODE 
     if(name[0] == NULL)
     {
         parent = findval(running->cwd);
@@ -34,12 +40,17 @@ int creat_file(void)
     {
         parent = findval(running->cwd);
     }
+    // Ensure parent is a directory 
     if(checktype(parent))
     {
         INODE *pip = &parent->INODE;
-        if(search2(pip, bname) == -1)
+        if(search(pip, bname) == -1)
         {
+            // Use mycreat to make file bname,
+            // mycreat will then call enter_child
+            // to add created file to parent.
             int ret = mycreat(parent, bname);
+            // increment parents link count since new file added
             pip->i_links_count++;
             parent->dirty = 1;
             iput(parent);
@@ -52,6 +63,11 @@ int creat_file(void)
     return -1;
 }
 
+/*
+    Develop a new file from bname by allocating new inode and 
+    setting inode properties, then pass to enter_child() 
+    to place new file into parent directory. 
+*/
 int mycreat(MINODE *mip, char *bname)
 {
     int ino = ialloc(mip->dev), i;
@@ -80,7 +96,7 @@ int mycreat(MINODE *mip, char *bname)
         // Change new to dirty and write to disk
         new->dirty = 1;
         iput(new);
-
+        // put file into parent directory under name bname
         enter_child(mip, ino, bname);
 
         return 1;

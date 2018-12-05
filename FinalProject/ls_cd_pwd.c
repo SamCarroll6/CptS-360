@@ -9,10 +9,13 @@ void lsdo(void)
 {
     int i = 0;
     MINODE *pathfollow;
+    // if no parameter passed run on cwd
     if(name[0] == NULL)
     {
         ls_dir(running->cwd);
     }
+    // otherwise get MINODE from file name passed and run
+    // ls_file or ls_dir depending on type of file found.
     else
     {
         if(!strcmp(name[0], "/"))
@@ -21,6 +24,7 @@ void lsdo(void)
         {
             pathfollow = findval(running->cwd);
         }
+        
         if(pathfollow != NULL)
         {
             if(checktype(pathfollow))

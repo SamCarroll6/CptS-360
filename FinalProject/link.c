@@ -13,6 +13,7 @@ int link(void)
         P1 = (char*)malloc(strlen(paths[1]) * sizeof(char));
         strcpy(P0, pathname);
         strcpy(P1, paths[1]);
+        // Get existing file from passed in parameters
         if(!strcmp(name[0], "/"))
         {
             Path1 = findval(root);
@@ -21,11 +22,13 @@ int link(void)
         {
             Path1 = findval(running->cwd);
         }
+        // If path1 doesn't exist return.
         if(!Path1)
         {
             printf("Error: Could not find file1\n");
             return -1;
         }
+        // Ensure either regular or link file.
         INODE *check = &Path1->INODE;
         if(!S_ISREG(check->i_mode) && !S_ISLNK(check->i_mode))
         {
@@ -33,6 +36,7 @@ int link(void)
             return -1;
         }
         int ino = Path1->ino;
+        // tokenize second passed in parameter. 
         tokenize(P1);
         // Get last value for name of actual new dir
         while(name[i])
@@ -40,12 +44,13 @@ int link(void)
             i++;
         }
         i = i - 1;
+        // Get bname of new file. 
         char bname[64];
-        // Copy found name to bname
         strcpy(bname, name[i]);
         // Set name[i] to NULL so it doesn't cause 
         // errors later when path is searched for location
         name[i] = NULL;
+        // get MINODE of parent to new file
         if(!strcmp(bname, "/"))
         {
             printf("Error: Link cannot create file '/': File exists\n");
@@ -63,12 +68,17 @@ int link(void)
         {
             parent = findval(running->cwd);
         }
+        // Ensure parent is of type directory
         if(checktype(parent))
         {
             INODE *pip = &Path1->INODE;
             INODE *Parip = &parent->INODE;
-            if(search2(Parip, bname) == -1)
+            // Make sure parent doesn't have a file
+            // with same name as bname
+            if(search(Parip, bname) == -1)
             {
+                // use mkdir enter_child funtction to 
+                // create bname within parent.
                 enter_child(parent, ino, bname);
                 pip->i_links_count++;
                 parent->dirty = 1;

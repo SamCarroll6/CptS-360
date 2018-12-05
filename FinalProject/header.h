@@ -84,8 +84,9 @@ char* Parse(char* input);
 char* readinput(void);
 int tokenize(char *pathname);
 int search(INODE *pip, char *name);
-int search2(INODE *pip, char *name);
 int is_empty(MINODE *mip);
+void menu(void);
+int getarrayval(char *input);
 
 // PWD, CD, LS functions
 void lsdo(void);

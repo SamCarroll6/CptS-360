@@ -12,6 +12,7 @@ int mysymlink(void)
         P1 = (char*)malloc(strlen(paths[1]) * sizeof(char));
         strcpy(P0, pathname);
         strcpy(P1, paths[1]);
+        // Find path of existing value. 
         if(!strcmp(name[0], "/"))
         {
             Path1 = findval(root);
@@ -25,6 +26,7 @@ int mysymlink(void)
             printf("Error: Could not find file1\n");
             return -1;
         }
+        // Ensure existing path is type regular or type directory
         INODE *check = &Path1->INODE;
         if(!S_ISREG(check->i_mode) && !S_ISDIR(check->i_mode))
         {
@@ -32,6 +34,7 @@ int mysymlink(void)
             return -1;
         }
         // Filename length can't be longer than 60.
+        // according to KC. 
         if(strlen(P0) >= 60)
         {
             printf("Error: file1 name too large symlnk failed\n");
@@ -48,8 +51,9 @@ int mysymlink(void)
         // creat_file overwrites name[] so we'll
         // recreate it again.
         strcpy(P1, paths[1]);
-        // tokenize(paths[1]);
         tokenize(P1);
+        // Find MINODE of newly created file representing 
+        // the file to be linked.
         if(!strcmp(name[0], "/"))
         {
             Path2 = findval(root);
@@ -63,13 +67,13 @@ int mysymlink(void)
             printf("Error: Could not find file2\n");
             return -1;
         }
+        // Ensure new file has proper mode for link
         INODE *pip = &Path2->INODE;
         pip->i_mode = 0120777;
         // if the strlen of the path is less than 60
         // store the name because it fits 
         // according to KC you have room for 60.
         strcpy(pip->i_block, P0);
-        printf("%s\n", (char*)pip->i_block);
         pip->i_size = strlen(P0);
         Path2->dirty = 1;
         iput(Path2);

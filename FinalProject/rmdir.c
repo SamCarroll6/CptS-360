@@ -1,9 +1,15 @@
 #include "header.h"
 
+/*
+    Initial function for rmdir, goes through and ensures the directory
+    can in fact be removed for various reasons. If it can it calls
+    rm_child and provides parent minode and name of child to be removed.
+*/
 int rm_dir(void)
 {
     int i = 0;
     MINODE *path, *parent;
+    // Ensure pathname provided 
     if(name[0] == NULL)
     {    
         printf("Usage: rmdir requires pathname\n");
@@ -18,14 +24,20 @@ int rm_dir(void)
     {
         path = findval(running->cwd);
     }
+    // Find bname of pathname
     while(name[i])
     {
         i++;
     }
     i = i - 1;
+    // store bname
     char bname[64];
     strcpy(bname, name[i]);
+    // replace bname with null in name[i] 
+    // so findval still works
     name[i] = NULL;
+    // checks to ensure directory can safely
+    // be removed (such as not root, exists, and not cwd).
     if(path == root)
     {
         printf("rmdir: cannot remove '%s': cannot remove root\n", bname);
@@ -41,10 +53,8 @@ int rm_dir(void)
         printf("Error: cannot remove current working directory\n");
         return -1;
     }
-    // If the bname is '.' for whatever reason
-    // we need to ensure the name is stored correctly
-    // we don't want to delete '.' from itself, we want to delete
-    // '.' from it's actual parent.
+    // Simply returns if bname equal to '.', based on actual linux
+    // which won't delete dir when bname is '.'
     if(!strcmp(bname, "."))
     {
         printf("Error: failed to remove '.': Invalid argument\n");
@@ -63,8 +73,11 @@ int rm_dir(void)
     {
         parent = findval(running->cwd);
     }
+    // Ensure that path to be deleted is a directory
+    // and is an empty directory.
     if(checktype(path) && is_empty(path))
     {
+        // get inodes of parent and path
         INODE *pip = &parent->INODE, *cip = &path->INODE;
         // Deallocate blocks in dir to be removed. 
         for(i = 0; i < 12 && cip->i_block[i] != 0; i++)
@@ -73,15 +86,23 @@ int rm_dir(void)
         }
         // deallocate ino in dir to be removed.
         idalloc(path->dev, path->ino);
+        // write deallocations back to disk
         iput(path);
+        // run rm_child to remove bname from
+        // parent directory
         int ret = rm_child(parent, bname);
         return ret;
     }
+    // if the path wasn't directory or the directory wasn't empty 
+    // print error
     printf("Path must be of type directory and must be empty\n");
     return -1;
 }
 
-
+/*
+    Takes a parent minode and childs name in that minode,
+    finds the child name in parent and removes it.
+*/
 int rm_child(MINODE *pmip, char *name)
 {
     INODE *pip = &pmip->INODE;
@@ -90,8 +111,11 @@ int rm_child(MINODE *pmip, char *name)
     char *cp;
     DIR *prev;
     size = pip->i_size;
+    // Check all 12 direct blocks of parent for child.
     for(i = 0; i < 12; i++)
     {
+        // once a block equals 0 we're done 
+        // and child could not be found.
         if(pip->i_block[i] == 0)
         {
             printf("Error: Bname not found\n");
@@ -101,10 +125,13 @@ int rm_child(MINODE *pmip, char *name)
         dp = (DIR *)buf;
         cp = buf;
         char nameval[BLKSIZE + 1];
+        // traverse given block pip->i_block[i] checking all entries 
+        // for match to bname
         while(cp < &buf[BLKSIZE])
         {
             memcpy(nameval, dp->name, dp->name_len);
             nameval[dp->name_len] = '\0';
+            // if we get a match of name within this block
 	        if(!strcmp(nameval, name))
 	        {
                 // if it is first and only entry in a block
@@ -117,14 +144,17 @@ int rm_child(MINODE *pmip, char *name)
                     // decrement parent size
                     pip->i_size -= BLKSIZE;
                     int count = i + 1;
-                    // Traverse remaining block and move down
+                    // Traverse remaining blocks and move down
                     // one spot in i_block[i] to remove blanks.
                     for(count; count < 12; count++)
                     {
+                        // Only matters if next block actually has content, otherwise
+                        // they can all be 0.
                         if(pip->i_block[count])
                         {
+                            // get next block and put at the previous blocks place
                             get_block(pmip->dev, pip->i_block[count], buf);
-                            put_block(pmip->dev, pip->i_block[count], buf);
+                            put_block(pmip->dev, pip->i_block[count-1], buf);
                         }
                         else
                         {
@@ -161,6 +191,8 @@ int rm_child(MINODE *pmip, char *name)
                     memmove(cp, moveS, moveE-moveS);
                     put_block(pmip->dev, pip->i_block[i], buf);
                 }
+                pmip->dirty = 1;
+                iput(pmip);
                 return 1;
 	        }
             prev = dp;

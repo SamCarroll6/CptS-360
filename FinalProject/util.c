@@ -126,7 +126,7 @@ int getino(MINODE *mip, char *name2)
 {
     int i, ino;
     INODE *check = &mip->INODE;
-    ino = search2(check, name2);
+    ino = search(check, name2);
     if(ino == -1)
     {
         printf("Name %s not found\n", name2);
@@ -189,7 +189,6 @@ int tokenize(char *pathname)
         name[i] = NULL;
         i++;
     }
-    printf("path = %s\n", pathname);
     if(pathname == NULL)
         return 0;
     char *token;
@@ -228,8 +227,6 @@ int checktype(MINODE *mip)
 
 int search(INODE *pip, char *name)
 {
-  printf("Search for %s\n", name);
-  printf("i_block[0] = %d\n", pip->i_block[0]);
   int size, i = 0;
   char buf[BLKSIZE];
   char *cp;
@@ -247,16 +244,13 @@ int search(INODE *pip, char *name)
     {
         memcpy(nameval, dp->name, dp->name_len);
         nameval[dp->name_len] = '\0';
-        printf("%d\t  %d\t\t%d\t%s\n", dp->inode, dp->rec_len, dp->name_len, nameval);
 	    if(!strcmp(nameval, name))
 	    {
-            printf("===========================================\n");
 		    return dp->inode;
 	    }
         cp += dp->rec_len;
         dp = (DIR*)cp;
     }
-    printf("===========================================\n");
   }
   return -1;
 }
@@ -294,37 +288,7 @@ MINODE* findval(MINODE *mip)
     return mip;
 }
 
-int search2(INODE *pip, char *name)
-{
-  int size, i = 0;
-  char buf[BLKSIZE];
-  char *cp;
-  size = pip->i_size;
-  // Search all direct blocks
-  for(i; i < 12; i++)
-  {
-    if(pip->i_block[i] == 0)
-        return -1;
-    get_block(fd, pip->i_block[i], buf);
-
-    dp = (DIR *)buf;
-    cp = buf;
-    char nameval[BLKSIZE + 1];
-    while(cp < &buf[BLKSIZE])
-    {
-        memcpy(nameval, dp->name, dp->name_len);
-        nameval[dp->name_len] = '\0';
-	    if(!strcmp(nameval, name))
-	    {
-	    	return dp->inode;
-	    }
-        cp += dp->rec_len;
-        dp = (DIR*)cp;
-    }
-  }
-  return -1;
-}
-
+// Check if directory is empty.
 int is_empty(MINODE *mip)
 {   
     INODE *pip = &mip->INODE;
@@ -348,4 +312,25 @@ int is_empty(MINODE *mip)
         i++;
     }
     return (i == 2) ? 1 : 0;
+}
+
+void menu(void)
+{
+    printf("======================================= MENU ========================================\n");
+	printf("mkdir  rmdir  ls  cd  pwd  creat  touch  rm  save  link  unlink  symlink  chmod  quit\n");
+    printf("=====================================================================================\n");
+}
+
+int getarrayval(char *input)
+{
+    int i = 0;
+    char *pars[12] = {"ls", "cd", "pwd", "quit", "mkdir", "creat", "rmdir", "symlink", "link", "touch", "unlink", "chmod"};
+    if(!strcmp(input, "rm"))
+        return 10;
+    for(i; i < 12; i++)
+    {
+        if(!strcmp(input, pars[i]))
+            return i;
+    }
+    return -1;
 }

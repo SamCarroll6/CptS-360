@@ -4,6 +4,7 @@ int main(int argc, char *argv[])
 {
     char *diskname = "mydisk";
     char *input, *hold, **path;
+    int (*Farr[12])(void) = {lsdo, chdir, pwd, quit, mdir, creat_file, rm_dir, mysymlink, link, touch, myunlink, mychmod};
     if(argc > 1)
         diskname = argv[1];
     fd = open(diskname, O_RDWR);
@@ -27,65 +28,14 @@ int main(int argc, char *argv[])
         int i = 0;
         if(input != 0)
         {
-            if(!strcmp(input, "ls"))
-            {
-                lsdo();
-            }
-            else if(!strcmp(input, "cd"))
-            {
-                chdir();
-            }
-            else if(!strcmp(input, "pwd"))
-            {
-                pwd();
-            }
-            else if(!strcmp(input, "quit"))
-            {
-                quit();
-            }
-            else if(!strcmp(input, "mkdir"))
-            {
-                mdir();
-            }
-            else if(!strcmp(input, "creat"))
-            {
-                creat_file();
-            }
-            else if(!strcmp(input, "rmdir"))
-            {
-                rm_dir();
-            }
-            else if(!strcmp(input, "symlink"))
-            {
-                mysymlink();
-            }
-            else if(!strcmp(input, "link"))
-            {
-                link();
-            }
-            else if(!strcmp(input, "touch"))
-            {
-                touch();
-            }
-            else if(!strcmp(input, "unlink"))
-            {
-                myunlink();
-            }
-            else if(!strcmp(input, "chmod"))
-            {
-                mychmod();
-            }
+            int check = getarrayval(input);
+            if(check >= 0)
+                Farr[check]();
             else
             {
                 printf("Error: Invalid command %s\n", input);
             }
         }
-        // i = 0;
-        // while(name[i])
-        // {
-        //     name[i] = NULL;
-        //     i++;
-        // }
         i = 0;
         while(paths[i])
         {

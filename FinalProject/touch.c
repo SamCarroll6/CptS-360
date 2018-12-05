@@ -5,6 +5,7 @@ int touch(void)
     MINODE *Path1;
     if(name[0])
     {
+        // Find and adjust time.
         if(!strcmp(name[0], "/"))
         {
             Path1 = findval(root);

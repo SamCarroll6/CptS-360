@@ -5,8 +5,10 @@ int myunlink(void)
 {
     MINODE *mip, *parent;
     int i;
+    // Ensure parameter was passed.
     if(name[0])
     {
+        // Find MINODE of filename to be deleted
         if(!strcmp(name[0], "/"))
         {
             mip = findval(root);
@@ -15,10 +17,13 @@ int myunlink(void)
         {
             mip = findval(running->cwd);
         }
+        // Ensure filename is either type regular file or link
         INODE *pip = &mip->INODE;
         if(S_ISLNK(pip->i_mode) || S_ISREG(pip->i_mode))
         {
             pip->i_links_count--;
+            // if no other files linked to this ino we'll
+            // deallocate the ino and blocks.
             if(pip->i_links_count <= 0)
             {
                 for(i = 0; i < 12 && pip->i_block[i] != 0; i++)
@@ -27,6 +32,7 @@ int myunlink(void)
                 }
                  idalloc(mip->dev, mip->ino);
             }
+            // Get bname of file to be deleted.
             i = 0;
             while(name[i])
             {
@@ -49,6 +55,8 @@ int myunlink(void)
             {
                 parent = findval(running->cwd);
             }
+            // Run rm_child from rm_dir on parent and 
+            // to be deleted bname
             rm_child(parent, bname);
             return 1;
         }
