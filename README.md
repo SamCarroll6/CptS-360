@@ -15,3 +15,8 @@ Uses the fork() and exec() functions to create a Linux kernel environment. Can r
 
 # Lab4
 My implementation of the cp -r command from linux. Allows the user to copy file to file, file to directory, or directory to directory. In the case of symbolic links in file to file copying it will give the newly copied file the same symbolic link that the original holds. Can work with copying to existing directories and can also create new ones if they don't exist.
+
+# PreLab6
+This was a prelab to assignment 6 of this course. We were tasked with printing information in realtion to the file system. Things such as the Super block, Inode block, Inode map, Block map, and a few others. This allowed us to get comfortable with finding and accessing this information for Lab6.
+
+# Lab6
