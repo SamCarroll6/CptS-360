@@ -26,7 +26,7 @@ This must run on an EXT2 filesystem, the provided example is called diskimage. F
 This will again run on an EXT2 filesystem, the provided example of diskimage from Lab6 works nicely for this task. This runs three basic Linux commands, ls, cd, and pwd on a given EXT2 filesystem. This was a prelab to our final project. The pathname to the mounted filesystem you want to run this on must be provided with the program call (i.e. a.out (path to filesystem). 
 
 # Lab8
-This assignment has two different aspects to it. As you can see there are two files client.c and server.c. These two files are compiled seperately and when run on different machines you can connect them. This allows you to input a command into client.c, the command will then be run on server.c and a completion message will be returned to the client side. The best way to run this is give specific names to compiled files:
+This assignment has two different aspects to it. As you can see there are two files client.c and server.c. These two files are compiled separately and when run on different machines you can connect them. This allows you to input a command into client.c, the command will then be run on server.c and a completion message will be returned to the client side. The best way to run this is give specific names to compiled files:
 gcc -o client.c client.out
 gcc -o server.c server.out
 
