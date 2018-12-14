@@ -17,10 +17,21 @@ Uses the fork() and exec() functions to create a Linux kernel environment. Can r
 My implementation of the cp -r command from linux. Allows the user to copy file to file, file to directory, or directory to directory. In the case of symbolic links in file to file copying it will give the newly copied file the same symbolic link that the original holds. Can work with copying to existing directories and can also create new ones if they don't exist.
 
 # PreLab6 
-This must be run on an EXT2 filesystem, the there is a shell script included for mounting a disk if needed. This was a prelab to assignment 6 of this course. We were tasked with printing information in realtion to the file system. Things such as the Super block, Inode block, Inode map, Block map, and a few others. This allowed us to get comfortable with finding and accessing this information for Lab6.
+This must be run on an EXT2 filesystem, the there is a shell script included for mounting a disk if needed. This was a prelab to assignment 6 of this course. We were tasked with printing information in realtion to the file system. Things such as the Super block, Inode block, Inode map, Block map, and a few others. This allowed us to get comfortable with finding and accessing this information for Lab6. The pathname to the mounted filesystem you want to run this on must be provided with the program call (i.e. a.out (path to filesystem). 
 
 # Lab6
-This must run on an EXT2 filesystem, the provided example is called diskimage. For this we were tasked with printing all of the allocated blocks on a file. This involved traversing the 12 direct blocks, all indirect blocks, and all double indirect blocks. The program only prints allocated blocks so it can be tested on the given diskimage with X/tinyfile for just direct blocks, Y/bigfile for the first indirect block, and then Z/hugefile for checking double indirect blocks (first letter of names may need to be capitalized I can't recall, i.e. Z/Hugefile if lowercase doesn't work.) 
+This must run on an EXT2 filesystem, the provided example is called diskimage. For this we were tasked with printing all of the allocated blocks on a file. This involved traversing the 12 direct blocks, all indirect blocks, and all double indirect blocks. The program only prints allocated blocks so it can be tested on the given diskimage with X/tinyfile for just direct blocks, Y/bigfile for the first indirect block, and then Z/hugefile for checking double indirect blocks (first letter of names may need to be capitalized I can't recall, i.e. Z/Hugefile if lowercase doesn't work). The pathname to the mounted filesystem you want to run this on must be provided with the program call (i.e. a.out (path to filesystem). 
 
 # Lab7
-This will again run on an EXT2 filesystem
+This will again run on an EXT2 filesystem, the provided example of diskimage from Lab6 works nicely for this task. This runs three basic Linux commands, ls, cd, and pwd on a given EXT2 filesystem. This was a prelab to our final project. The pathname to the mounted filesystem you want to run this on must be provided with the program call (i.e. a.out (path to filesystem). 
+
+# Lab8
+This assignment has two different aspects to it. As you can see there are two files client.c and server.c. These two files are compiled seperately and when run on different machines you can connect them. This allows you to input a command into client.c, the command will then be run on server.c and a completion message will be returned to the client side. The best way to run this is give specific names to compiled files:
+gcc -o client.c client.out
+gcc -o server.c server.out
+
+# Project
+This is our final project for this course, my implementation reaches level 1 commands of a filesystem which includes ls, cd, pwd, mkdir, rmdir, creat, rm, link, symlink, and unlink. There's a few other commands in there as well but these are the main ones. The program takes a path to an EXT2 filesystem and runs on the filesystem provided. You can give it an empty filesystem or an already filled one and run any of the previously listed commands ('?' will give a list of all possible commands it can run if a reminder is needed). The easiest way to compile this is in Linux:
+First command: gcc -c *.c
+Second command: gcc *.o
+then run as: ./a.out (Path to filesystem)
