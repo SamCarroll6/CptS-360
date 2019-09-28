@@ -34,4 +34,4 @@ gcc -o server.c server.out
 This is our final project for this course, my implementation reaches level 1 commands of a filesystem which includes ls, cd, pwd, mkdir, rmdir, creat, rm, link, symlink, and unlink. There's a few other commands in there as well but these are the main ones. The program takes a path to an EXT2 filesystem and runs on the filesystem provided. You can give it an empty filesystem or an already filled one and run any of the previously listed commands ('?' will give a list of all possible commands it can run if a reminder is needed). The easiest way to compile this is in Linux:
 First command: gcc -c *.c
 Second command: gcc *.o
-then run as: ./a.out (Path to filesystem)
+then run as: ./a.out <Path to filesystem>
